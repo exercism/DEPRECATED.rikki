@@ -87,6 +87,11 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		return
 	}
 
+	if cp.Language != "ruby" {
+		lgr.Println("Skipping code in %s", cp.Language)
+		return
+	}
+
 	// Step 2: submit code to analysseur
 	url = fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, cp.Language)
 	ab := analysisBody{Code: cp.Code}
