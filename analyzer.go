@@ -76,14 +76,14 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		lgr.Printf("%s responded with status %v - %v", url, resp.StatusCode, string(body))
+		lgr.Printf("%s responded with status %v - %v\n", url, resp.StatusCode, string(body))
 		return
 	}
 
 	var cp codePayload
 	err = json.Unmarshal(body, &cp)
 	if err != nil {
-		lgr.Println(err)
+		lgr.Printf("%s - %v\n", submissionKey, err)
 		return
 	}
 
@@ -97,43 +97,50 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	ab := analysisBody{Code: cp.Code}
 	abJSON, err := json.Marshal(ab)
 	if err != nil {
-		lgr.Println(err)
+		lgr.Printf("%s - %v", submissionKey, err)
 		return
 	}
 
 	req, err = http.NewRequest("POST", url, bytes.NewReader(abJSON))
 	if err != nil {
-		lgr.Printf("cannot prepare request to %s - %v\n", url, err)
+		lgr.Printf("%s - cannot prepare request to %s - %v\n", submissionKey, url, err)
 		return
 	}
 	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
-		lgr.Printf("request to %s failed - %v\n", url, err)
+		lgr.Printf("%s - request to %s failed - %v\n", submissionKey, url, err)
 		return
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		lgr.Printf("%s responded with status %v - %v", url, resp.StatusCode, string(body))
+		lgr.Printf("%s - %s responded with status %v - %v", submissionKey, url, resp.StatusCode, string(body))
 		return
 	}
 
 	var ap analysisPayload
 	err = json.Unmarshal(body, &ap)
 	if err != nil {
-		lgr.Println(err)
+		lgr.Printf("%s - %v", submissionKey, err)
 		return
 	}
 
 	if ap.Error != "" {
-		lgr.Printf("analysis api is complaining - %s", ap.Error)
+		lgr.Printf("analysis api is complaining about %s - %s", submissionKey, ap.Error)
 		return
 	}
 
 	if len(ap.Results) == 0 {
 		// no feedback, bailing
 		return
+	}
+
+	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)
+	for _, result := range ap.Results {
+		for _, key := range result.Keys {
+			sanity.Printf("%s : %s - %s\n", submissionKey, result.Type, key)
+		}
 	}
 
 	// Step 3: Find comments based on analysis result
