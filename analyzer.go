@@ -163,14 +163,16 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 
 	// Step 4: submit random comment to exercism.io api
 	comment := comments[rand.Intn(len(comments))]
-	url = fmt.Sprintf("%s/api/v1/submissions/%s/comments?shared_key=%s", analyzer.exercismHost, submissionKey, analyzer.auth)
-	cb := commentBody{Comment: string(comment)}
+	experiment := "_This is an automated nitpick. [Read more](http://exercism.io/rikki) about this experiment._"
+	s := fmt.Sprintf("%s\n-----\n%s", string(comment), experiment)
+	cb := commentBody{Comment: s}
 	cbJSON, err := json.Marshal(cb)
 	if err != nil {
 		lgr.Println(err)
 		return
 	}
 
+	url = fmt.Sprintf("%s/api/v1/submissions/%s/comments?shared_key=%s", analyzer.exercismHost, submissionKey, analyzer.auth)
 	req, err = http.NewRequest("POST", url, bytes.NewReader(cbJSON))
 	if err != nil {
 		lgr.Printf("cannot prepare request to %s - %v\n", url, err)
