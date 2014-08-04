@@ -151,7 +151,6 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 			if _, err = os.Stat(filename); err != nil {
 				if os.IsNotExist(err) {
 					lgr.Printf("we need to add a comment for %s - %s\n", result.Type, key)
-					return
 				}
 				lgr.Println(err)
 			}
