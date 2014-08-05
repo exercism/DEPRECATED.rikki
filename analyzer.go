@@ -35,9 +35,6 @@ type codePayload struct {
 	Error    string `json:"error"`
 }
 
-type analysisBody struct {
-	Code string `json:"code"`
-}
 type analysisResult struct {
 	Type string   `json:"type"`
 	Keys []string `json:"keys"`
@@ -94,14 +91,18 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 
 	// Step 2: submit code to analysseur
 	url = fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, cp.Language)
-	ab := analysisBody{Code: cp.Code}
-	abJSON, err := json.Marshal(ab)
+	reqBody := struct {
+		Code string `json:"code"`
+	}{
+		cp.Code,
+	}
+	reqBodyJSON, err := json.Marshal(reqBody)
 	if err != nil {
 		lgr.Printf("%s - %v", submissionKey, err)
 		return
 	}
 
-	req, err = http.NewRequest("POST", url, bytes.NewReader(abJSON))
+	req, err = http.NewRequest("POST", url, bytes.NewReader(reqBodyJSON))
 	if err != nil {
 		lgr.Printf("%s - cannot prepare request to %s - %v\n", submissionKey, url, err)
 		return
