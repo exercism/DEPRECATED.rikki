@@ -25,19 +25,24 @@ func main() {
 	}
 	flag.Parse()
 
+	workers.Configure(redisConfig())
+
+	analyzer := NewAnalyzer(*exercismFlag, *analysseurFlag, NewAuth().Key())
+	workers.Process("analyze", analyzer.process, 4)
+
+	workers.Run()
+}
+
+func redisConfig() map[string]string {
 	url, err := url.Parse(*redisFlag)
 	if err != nil {
 		panic(err)
 	}
 	config := map[string]string{
-		// location of redis instance
-		"server": url.Host,
-		// instance of the database
+		"server":   url.Host,
 		"database": strings.Trim(url.Path, "/"),
-		// number of connections to keep open with redis
-		"pool": "30",
-		// unique process id for this instance of workers (for proper recovery of inprogress jobs on crash)
-		"process": "1",
+		"pool":     "30",
+		"process":  "1",
 	}
 	if url.User != nil {
 		password, ok := url.User.Password()
@@ -45,11 +50,5 @@ func main() {
 			config["password"] = password
 		}
 	}
-
-	workers.Configure(config)
-
-	analyzer := NewAnalyzer(*exercismFlag, *analysseurFlag, NewAuth().Key())
-	workers.Process("analyze", analyzer.process, 4)
-
-	workers.Run()
+	return config
 }
