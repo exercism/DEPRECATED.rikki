@@ -147,18 +147,13 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	var comments [][]byte
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
-			filename := fmt.Sprintf("comments/%s/%s/%s.md", cp.Language, result.Type, key)
-			if _, err = os.Stat(filename); err != nil {
-				if os.IsNotExist(err) {
-					lgr.Printf("we need to add a comment for %s - %s\n", result.Type, key)
-				}
-				lgr.Println(err)
-			}
-			comment, err := ioutil.ReadFile(filename)
+			c := NewComment(cp.Language, result.Type, key)
+			b, err := c.Bytes()
 			if err != nil {
-				lgr.Printf("unable to read %s - %v", filename, err)
-			} else {
-				comments = append(comments, comment)
+				lgr.Printf("We probably need to add a comment at %s - %s\n", c.Path(), err)
+			}
+			if len(b) > 0 {
+				comments = append(comments, b)
 			}
 		}
 	}
