@@ -1,4 +1,4 @@
 #!/bin/bash
 
-go build
-GOOS=linux GOARCH=amd64 go build -o rikki-linux-amd64
+go build -o deploy/rikki
+GOOS=linux GOARCH=amd64 go build -o deploy/rikki-linux-amd64
