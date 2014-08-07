@@ -15,7 +15,7 @@ type Comment struct {
 
 func NewComment(language, category, issue string) *Comment {
 	return &Comment{
-		Dir:      "comments",
+		Dir:      commentDir(),
 		Language: language,
 		Category: category,
 		Issue:    issue,
@@ -36,4 +36,12 @@ func (c *Comment) Bytes() ([]byte, error) {
 		return b, err
 	}
 	return comment, nil
+}
+
+func commentDir() string {
+	dir := os.Getenv("RIKKI_FEEDBACK_DIR")
+	if dir == "" {
+		dir = "comments"
+	}
+	return dir
 }
