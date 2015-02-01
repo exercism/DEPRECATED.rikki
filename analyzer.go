@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"strings"
 	"math/rand"
 	"net/http"
 	"os"
@@ -30,8 +31,8 @@ func NewAnalyzer(exercism, analysseur, auth string) *Analyzer {
 }
 
 type codePayload struct {
-	Language string `json:"language"`
-	Code     string `json:"code"`
+	TrackID string `json:"track_id"`
+	SolutionFiles     map[string]string `json:"solution_files"`
 	Error    string `json:"error"`
 }
 
@@ -86,17 +87,22 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		return
 	}
 
-	if cp.Language != "ruby" {
-		lgr.Printf("Skipping code in %s\n", cp.Language)
+	if cp.TrackID != "ruby" {
+		lgr.Printf("Skipping code in %s\n", cp.TrackID)
 		return
 	}
 
+	var solutions []string
+	for _, solution := range cp.SolutionFiles {
+		solutions = append(solutions, solution)
+	}
+
 	// Step 2: submit code to analysseur
-	url = fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, cp.Language)
+	url = fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, cp.TrackID)
 	codeBody := struct {
 		Code string `json:"code"`
 	}{
-		cp.Code,
+		strings.Join(solutions, "\n"),
 	}
 	codeBodyJSON, err := json.Marshal(codeBody)
 	if err != nil {
@@ -154,7 +160,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	var comments [][]byte
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
-			c := NewComment(cp.Language, result.Type, key)
+			c := NewComment(cp.TrackID, result.Type, key)
 			b, err := c.Bytes()
 			if err != nil {
 				lgr.Printf("We probably need to add a comment at %s - %s\n", c.Path(), err)
