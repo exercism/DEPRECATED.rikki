@@ -53,7 +53,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 
 	submissionKey, err := msg.Args().GetIndex(0).String()
 	if err != nil {
-		lgr.Printf("unable to determine submission key - %v\n", err)
+		lgr.Printf("unable to determine submission key - %s\n", err)
 		return
 	}
 
@@ -61,74 +61,80 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s", analyzer.exercismHost, submissionKey)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		lgr.Printf("cannot prepare request to %s - %v\n", url, err)
+		lgr.Printf("cannot prepare request to %s - %s\n", url, err)
 		return
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		lgr.Printf("request to %s failed - %v\n", url, err)
+		lgr.Printf("request to %s failed - %s\n", url, err)
 		return
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		lgr.Printf("cannot read response - %s\n", err)
+	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		lgr.Printf("%s responded with status %v - %v\n", url, resp.StatusCode, string(body))
+		lgr.Printf("%s responded with status %d - %s\n", url, resp.StatusCode, string(body))
 		return
 	}
 
 	var cp codePayload
-	err = json.Unmarshal(body, &cp)
-	if err != nil {
-		lgr.Printf("%s - %v\n", submissionKey, err)
+	if err := json.Unmarshal(body, &cp); err != nil {
+		lgr.Printf("%s - %s\n", submissionKey, err)
 		return
 	}
 
 	if cp.Language != "ruby" {
-		lgr.Println("Skipping code in %s", cp.Language)
+		lgr.Printf("Skipping code in %s\n", cp.Language)
 		return
 	}
 
 	// Step 2: submit code to analysseur
 	url = fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, cp.Language)
-	reqBody := struct {
+	codeBody := struct {
 		Code string `json:"code"`
 	}{
 		cp.Code,
 	}
-	reqBodyJSON, err := json.Marshal(reqBody)
+	codeBodyJSON, err := json.Marshal(codeBody)
 	if err != nil {
-		lgr.Printf("%s - %v", submissionKey, err)
+		lgr.Printf("%s - %s\n", submissionKey, err)
 		return
 	}
 
-	req, err = http.NewRequest("POST", url, bytes.NewReader(reqBodyJSON))
+	req, err = http.NewRequest("POST", url, bytes.NewReader(codeBodyJSON))
 	if err != nil {
-		lgr.Printf("%s - cannot prepare request to %s - %v\n", submissionKey, url, err)
+		lgr.Printf("%s - cannot prepare request to %s - %s\n", submissionKey, url, err)
 		return
 	}
 	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
-		lgr.Printf("%s - request to %s failed - %v\n", submissionKey, url, err)
+		lgr.Printf("%s - request to %s failed - %s\n", submissionKey, url, err)
 		return
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
+	if err != nil {
+		lgr.Printf("%s - failed to fetch submission - %s\n", submissionKey, err)
+		return
+	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		lgr.Printf("%s - %s responded with status %v - %v", submissionKey, url, resp.StatusCode, string(body))
+		lgr.Printf("%s - %s responded with status %d - %s\n", submissionKey, url, resp.StatusCode, string(body))
 		return
 	}
 
 	var ap analysisPayload
 	err = json.Unmarshal(body, &ap)
 	if err != nil {
-		lgr.Printf("%s - %v", submissionKey, err)
+		lgr.Printf("%s - %s\n", submissionKey, err)
 		return
 	}
 
 	if ap.Error != "" {
-		lgr.Printf("analysis api is complaining about %s - %s", submissionKey, ap.Error)
+		lgr.Printf("analysis api is complaining about %s - %s\n", submissionKey, ap.Error)
 		return
 	}
 
@@ -167,29 +173,34 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	comment := comments[rand.Intn(len(comments))]
 	experiment := "_This is an automated nitpick. [Read more](http://exercism.io/rikki) about this experiment._"
 	s := fmt.Sprintf("%s\n-----\n%s", string(comment), experiment)
-	cb := commentBody{Comment: s}
-	cbJSON, err := json.Marshal(cb)
+
+	commentBody := struct {
+		Comment string `json:"comment"`
+	}{
+		s,
+	}
+	commentBodyJSON, err := json.Marshal(commentBody)
 	if err != nil {
 		lgr.Println(err)
 		return
 	}
 
 	url = fmt.Sprintf("%s/api/v1/submissions/%s/comments?shared_key=%s", analyzer.exercismHost, submissionKey, analyzer.auth)
-	req, err = http.NewRequest("POST", url, bytes.NewReader(cbJSON))
+	req, err = http.NewRequest("POST", url, bytes.NewReader(commentBodyJSON))
 	if err != nil {
-		lgr.Printf("cannot prepare request to %s - %v\n", url, err)
+		lgr.Printf("cannot prepare request to %s - %s\n", url, err)
 		return
 	}
 	resp, err = http.DefaultClient.Do(req)
 	if err != nil {
-		lgr.Printf("request to %s failed - %v\n", url, err)
+		lgr.Printf("request to %s failed - %s\n", url, err)
 		return
 	}
 
 	body, err = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusNoContent {
-		lgr.Printf("%s responded with status %v - %v", url, resp.StatusCode, string(body))
+		lgr.Printf("%s responded with status %d - %s\n", url, resp.StatusCode, string(body))
 		return
 	}
 }
