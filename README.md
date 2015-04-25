@@ -56,3 +56,12 @@ These can be overridden using command-line flags:
 ```bash
 $ ./rikki -redis=redis://user:pass@host:port/db/ -exercism=http://exercism.io -analysseur=http://analysseur.exercism.io
 ```
+
+## Enqueuing a Job
+
+Start the console in exercism, find the uuid (a.k.a. `key`)  of the submission
+you wish to process, and enqueue the job with:
+
+```
+Jobs::Analyze.perform_async(uuid)
+```
