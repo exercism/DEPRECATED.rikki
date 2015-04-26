@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"strings"
 	"math/rand"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/jrallison/go-workers"
 )
@@ -31,9 +31,9 @@ func NewAnalyzer(exercism, analysseur, auth string) *Analyzer {
 }
 
 type codePayload struct {
-	TrackID string `json:"track_id"`
-	SolutionFiles     map[string]string `json:"solution_files"`
-	Error    string `json:"error"`
+	TrackID       string            `json:"track_id"`
+	SolutionFiles map[string]string `json:"solution_files"`
+	Error         string            `json:"error"`
 }
 
 type analysisResult struct {
