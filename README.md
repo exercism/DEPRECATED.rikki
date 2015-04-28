@@ -15,7 +15,7 @@ placed in a queue implemented in redis.
 Rikki pulls the uuid off the queue, makes a request to exercism.io's API to get the
 code, then submits the code to the analysseur API.
 
-Analysseur uses analyzers/rules defined in github.com/JacobNinja/exercism-analysis,
+Analysseur uses analyzers/rules defined in the [exercism-analysis repository](https://github.com/JacobNinja/exercism-analysis),
 and responds with a list of violations. Each violation consists of type and a
 possible list of keys.
 
