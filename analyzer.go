@@ -157,13 +157,17 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	}
 
 	// Step 3: Find comments based on analysis result
+	// We are loading the results before choosing a comment at random
+	// since not all results will have an associated comment, and it's
+	// better to be a bit wasteful than to not submit a comment when
+	// we could have.
 	var comments [][]byte
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
-			c := NewComment(cp.TrackID, result.Type, key)
+			c := NewAnalyzerComment("", cp.TrackID, result.Type, key)
 			b, err := c.Bytes()
 			if err != nil {
-				lgr.Printf("We probably need to add a comment at %s - %s\n", c.Path(), err)
+				lgr.Printf("We probably need to add a comment at %s - %s\n", c.path, err)
 			}
 			if len(b) > 0 {
 				comments = append(comments, b)

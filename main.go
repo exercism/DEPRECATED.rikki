@@ -52,3 +52,11 @@ func redisConfig() map[string]string {
 	}
 	return config
 }
+
+func commentDir() string {
+	dir := os.Getenv("RIKKI_FEEDBACK_DIR")
+	if dir == "" {
+		dir = "comments"
+	}
+	return dir
+}

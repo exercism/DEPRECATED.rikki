@@ -7,41 +7,26 @@ import (
 )
 
 type Comment struct {
-	Dir      string
-	Language string
-	Category string
-	Issue    string
+	path string
 }
 
-func NewComment(language, category, issue string) *Comment {
-	return &Comment{
-		Dir:      commentDir(),
-		Language: language,
-		Category: category,
-		Issue:    issue,
+func NewAnalyzerComment(dir, language, category, issue string) *Comment {
+	if dir == "" {
+		dir = commentDir()
 	}
-}
-
-func (c *Comment) Path() string {
-	return fmt.Sprintf("%s/%s/%s/%s.md", c.Dir, c.Language, c.Category, c.Issue)
+	return &Comment{
+		path: fmt.Sprintf("%s/analyzer/%s/%s/%s.md", dir, language, category, issue),
+	}
 }
 
 func (c *Comment) Bytes() ([]byte, error) {
 	var b []byte
-	if _, err := os.Stat(c.Path()); err != nil {
+	if _, err := os.Stat(c.path); err != nil {
 		return b, err
 	}
-	comment, err := ioutil.ReadFile(c.Path())
+	comment, err := ioutil.ReadFile(c.path)
 	if err != nil {
 		return b, err
 	}
 	return comment, nil
-}
-
-func commentDir() string {
-	dir := os.Getenv("RIKKI_FEEDBACK_DIR")
-	if dir == "" {
-		dir = "comments"
-	}
-	return dir
 }

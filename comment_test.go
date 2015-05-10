@@ -5,11 +5,10 @@ import "testing"
 const fakeCommentDir = "fixtures/feedback"
 
 func TestExistingComment(t *testing.T) {
-	c := NewComment("ruby", "loops", "nesting")
-	c.Dir = fakeCommentDir
+	c := NewAnalyzerComment(fakeCommentDir, "ruby", "loops", "nesting")
 	b, err := c.Bytes()
 	if err != nil {
-		t.Errorf("Unexpected error in comment at %s - %s", c.Path(), err)
+		t.Errorf("Unexpected error in comment at %s - %s", c.path, err)
 	}
 	expected := "Nope.\n"
 	if string(b) != expected {
@@ -18,12 +17,10 @@ func TestExistingComment(t *testing.T) {
 }
 
 func TestMissingComment(t *testing.T) {
-	c := NewComment("ruby", "loops", "too-many")
-	c.Dir = fakeCommentDir
-
+	c := NewAnalyzerComment(fakeCommentDir, "ruby", "loops", "too-many")
 	b, err := c.Bytes()
 	if err == nil {
-		t.Errorf("Comment should be missing at %s", c.Path())
+		t.Errorf("Comment should be missing at %s", c.path)
 	}
 	if len(b) != 0 {
 		t.Error("Comment should be an empty string when the problem is missing.")
