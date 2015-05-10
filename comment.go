@@ -19,6 +19,15 @@ func NewAnalyzerComment(dir, language, category, issue string) *Comment {
 	}
 }
 
+func NewHelloComment(dir string) *Comment {
+	if dir == "" {
+		dir = commentDir()
+	}
+	return &Comment{
+		path: fmt.Sprintf("%s/hello/hello.md", dir),
+	}
+}
+
 func (c *Comment) Bytes() ([]byte, error) {
 	var b []byte
 	if _, err := os.Stat(c.path); err != nil {

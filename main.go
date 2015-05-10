@@ -35,6 +35,9 @@ func main() {
 	analyzer := NewAnalyzer(exercism, *analysseurFlag)
 	workers.Process("analyze", analyzer.process, 4)
 
+	hello := NewHello(exercism)
+	workers.Process("hello", hello.process, 4)
+
 	workers.Run()
 }
 
