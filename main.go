@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/url"
 	"os"
@@ -16,6 +17,8 @@ var redisFlag = flag.String("redis", "redis://localhost:6379/0/", "Redis databas
 var exercismFlag = flag.String("exercism", "http://localhost:4567", "Url of exercism api, e.g. http://exercism.io")
 var analysseurFlag = flag.String("analysseur", "http://localhost:8989", "Url of analysseur api, e.g. http://analysseur.exercism.io")
 
+var lgr = log.New(os.Stdout, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
+
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
 
@@ -27,7 +30,9 @@ func main() {
 
 	workers.Configure(redisConfig())
 
-	analyzer := NewAnalyzer(*exercismFlag, *analysseurFlag, NewAuth().Key())
+	exercism := NewExercism(*exercismFlag, NewAuth().Key())
+
+	analyzer := NewAnalyzer(exercism, *analysseurFlag)
 	workers.Process("analyze", analyzer.process, 4)
 
 	workers.Run()
