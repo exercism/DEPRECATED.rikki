@@ -8,11 +8,13 @@ import (
 	"net/http"
 )
 
+// Exercism is a client that talks to the exercism API.
 type Exercism struct {
 	Host string
 	Auth string
 }
 
+// NewExercism creates an exercism client, configured to talk to the API.
 func NewExercism(host, auth string) *Exercism {
 	return &Exercism{Host: host, Auth: auth}
 }
@@ -27,11 +29,13 @@ type commentBody struct {
 	Comment string `json:"comment"`
 }
 
+// Solution is an iteration of a specific problem in a particular language.
 type Solution struct {
 	TrackID string
 	Sources []string
 }
 
+// FetchSolution fetches the code of a solution from the exercism API.
 func (e *Exercism) FetchSolution(uuid string) (*Solution, error) {
 	url := fmt.Sprintf("%s/api/v1/submissions/%s", e.Host, uuid)
 	req, err := http.NewRequest("GET", url, nil)
@@ -64,6 +68,7 @@ func (e *Exercism) FetchSolution(uuid string) (*Solution, error) {
 	return &Solution{TrackID: cp.TrackID, Sources: sources}, nil
 }
 
+// SubmitComment submits a rikki- comment to a particular submission via the exercism API.
 func (e *Exercism) SubmitComment(comment []byte, uuid string) error {
 	experiment := "_This is an automated nitpick. [Read more](http://exercism.io/rikki) about this experiment._"
 	s := fmt.Sprintf("%s\n-----\n%s", string(comment), experiment)

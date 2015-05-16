@@ -6,10 +6,17 @@ import (
 	"os"
 )
 
+// Auth is a simple shared secret.
+// If the rikki project ever becomes a larger part of the
+// exercism ecosystem, we should consider improving the security
+// around it.
 type Auth struct {
 	Secret string
 }
 
+// NewAuth configures a shared secret.
+// It looks in an environment variable for a pass phrase, and
+// falls back to a common value for development if not set.
 func NewAuth() *Auth {
 	a := Auth{}
 	a.Secret = os.Getenv("RIKKI_SECRET")

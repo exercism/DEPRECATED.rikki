@@ -2,10 +2,14 @@ package main
 
 import "github.com/jrallison/go-workers"
 
+// Hello is a job that provides encouragement after someone submits "Hello World".
+// The job receives the uuid of a submission and submits a comment from rikki-
+// to the conversation on exercism.
 type Hello struct {
 	exercism *Exercism
 }
 
+// NewHello configures a Hello job to talk to the exercism API.
 func NewHello(exercism *Exercism) *Hello {
 	return &Hello{
 		exercism: exercism,

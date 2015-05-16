@@ -14,11 +14,17 @@ import (
 	"github.com/jrallison/go-workers"
 )
 
+// Analyzer is a job that provides feedback on specific issues in the code.
+// The job receives the uuid of a submission, calls the exercism API to get
+// the code, submits the code to analysseur for static analysis, and then,
+// based on the results, chooses a response to submit as a comment from rikki-
+// back to the conversation on exercism.
 type Analyzer struct {
 	exercism       *Exercism
 	analysseurHost string
 }
 
+// NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
 func NewAnalyzer(exercism *Exercism, analysseur string) *Analyzer {
 	return &Analyzer{
 		exercism:       exercism,
