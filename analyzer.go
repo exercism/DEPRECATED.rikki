@@ -139,28 +139,38 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		return
 	}
 
-	var comments [][]byte
+	var smells []string
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
 			sanity.Printf("%s : %s - %s\n", uuid, result.Type, key)
 
-			key := filepath.Join(result.Type, key)
-			b := analyzer.comments[key]
-
-			if len(b) > 0 {
-				comments = append(comments, b)
-			}
+			smells = append(smells, filepath.Join(result.Type, key))
 		}
 	}
 
-	if len(comments) == 0 {
-		// no comments, bailing
+	// shuffle code smells
+	for i := range smells {
+		j := rand.Intn(i + 1)
+		smells[i], smells[j] = smells[j], smells[i]
+	}
+
+	// return the first available comment
+	var comment []byte
+	for _, smell := range smells {
+		b := analyzer.comments[smell]
+
+		if len(b) > 0 {
+			comment = b
+			break
+		}
+	}
+
+	if len(comment) == 0 {
 		return
 	}
 
 	// Step 3: submit random comment to exercism.io api
-	comment := comments[rand.Intn(len(comments))]
 	if err := analyzer.exercism.SubmitComment(comment, uuid); err != nil {
 		lgr.Printf("%s\n", err)
 	}
