@@ -70,13 +70,13 @@ type analysisPayload struct {
 }
 
 func (analyzer *Analyzer) process(msg *workers.Msg) {
-	submissionUuid, err := msg.Args().GetIndex(0).String()
+	uuid, err := msg.Args().GetIndex(0).String()
 	if err != nil {
 		lgr.Printf("unable to determine submission key - %s\n", err)
 		return
 	}
 
-	solution, err := analyzer.exercism.FetchSolution(submissionUuid)
+	solution, err := analyzer.exercism.FetchSolution(uuid)
 	if err != nil {
 		lgr.Printf("%s\n", err)
 		return
@@ -96,41 +96,41 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	}
 	codeBodyJSON, err := json.Marshal(codeBody)
 	if err != nil {
-		lgr.Printf("%s - %s\n", submissionUuid, err)
+		lgr.Printf("%s - %s\n", uuid, err)
 		return
 	}
 
 	req, err := http.NewRequest("POST", url, bytes.NewReader(codeBodyJSON))
 	if err != nil {
-		lgr.Printf("%s - cannot prepare request to %s - %s\n", submissionUuid, url, err)
+		lgr.Printf("%s - cannot prepare request to %s - %s\n", uuid, url, err)
 		return
 	}
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
-		lgr.Printf("%s - request to %s failed - %s\n", submissionUuid, url, err)
+		lgr.Printf("%s - request to %s failed - %s\n", uuid, url, err)
 		return
 	}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		lgr.Printf("%s - failed to fetch submission - %s\n", submissionUuid, err)
+		lgr.Printf("%s - failed to fetch submission - %s\n", uuid, err)
 		return
 	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		lgr.Printf("%s - %s responded with status %d - %s\n", submissionUuid, url, resp.StatusCode, string(body))
+		lgr.Printf("%s - %s responded with status %d - %s\n", uuid, url, resp.StatusCode, string(body))
 		return
 	}
 
 	var ap analysisPayload
 	err = json.Unmarshal(body, &ap)
 	if err != nil {
-		lgr.Printf("%s - %s\n", submissionUuid, err)
+		lgr.Printf("%s - %s\n", uuid, err)
 		return
 	}
 
 	if ap.Error != "" {
-		lgr.Printf("analysis api is complaining about %s - %s\n", submissionUuid, ap.Error)
+		lgr.Printf("analysis api is complaining about %s - %s\n", uuid, ap.Error)
 		return
 	}
 
@@ -143,7 +143,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
-			sanity.Printf("%s : %s - %s\n", submissionUuid, result.Type, key)
+			sanity.Printf("%s : %s - %s\n", uuid, result.Type, key)
 
 			key := filepath.Join(result.Type, key)
 			b := analyzer.comments[key]
@@ -161,7 +161,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 
 	// Step 3: submit random comment to exercism.io api
 	comment := comments[rand.Intn(len(comments))]
-	if err := analyzer.exercism.SubmitComment(comment, submissionUuid); err != nil {
+	if err := analyzer.exercism.SubmitComment(comment, uuid); err != nil {
 		lgr.Printf("%s\n", err)
 	}
 }
