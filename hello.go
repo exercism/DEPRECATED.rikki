@@ -7,31 +7,29 @@ import "github.com/jrallison/go-workers"
 // to the conversation on exercism.
 type Hello struct {
 	exercism *Exercism
+	comment  []byte
 }
 
 // NewHello configures a Hello job to talk to the exercism API.
-func NewHello(exercism *Exercism) *Hello {
+func NewHello(exercism *Exercism) (*Hello, error) {
+	b, err := NewHelloComment("").Bytes()
+	if err != nil {
+		return nil, err
+	}
 	return &Hello{
 		exercism: exercism,
-	}
+		comment:  b,
+	}, nil
 }
 
 func (hello *Hello) process(msg *workers.Msg) {
-	submissionUuid, err := msg.Args().GetIndex(0).String()
+	uuid, err := msg.Args().GetIndex(0).String()
 	if err != nil {
 		lgr.Printf("unable to determine submission uuid - %s\n", err)
 		return
 	}
 
-	// load rikki-'s encouragement
-	c := NewHelloComment("")
-	body, err := c.Bytes()
-	if err != nil {
-		lgr.Printf("%s\n", err)
-		return
-	}
-
-	if err := hello.exercism.SubmitComment(body, submissionUuid); err != nil {
+	if err := hello.exercism.SubmitComment(hello.comment, uuid); err != nil {
 		lgr.Printf("%s\n", err)
 	}
 }
