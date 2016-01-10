@@ -41,8 +41,8 @@ file as a comment to the exercism.io.
 ## Usage
 
 ```bash
-$ go build ./...
-$ ./rikki
+$ go install github.com/exercism/rikki
+$ rikki
 ```
 
 By default the worker runs against
