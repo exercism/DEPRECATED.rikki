@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
 )
 
@@ -33,7 +34,9 @@ func main() {
 
 	exercism := NewExercism(*exercismFlag, NewAuth().Key())
 
-	analyzer, err := NewAnalyzer(exercism, *analysseurFlag, commentDir())
+	ruby.Host = *analysseurFlag
+
+	analyzer, err := NewAnalyzer(exercism, commentDir())
 	if err != nil {
 		lgr.Print(err)
 		os.Exit(1)
