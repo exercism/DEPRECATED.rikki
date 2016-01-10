@@ -23,9 +23,14 @@ func NewHello(exercism *Exercism) (*Hello, error) {
 }
 
 func (hello *Hello) process(msg *workers.Msg) {
-	uuid, err := msg.Args().GetIndex(0).String()
+	args := msg.Args()
+	uuid, err := args.GetIndex(0).String()
 	if err != nil {
 		lgr.Printf("unable to determine submission uuid - %s\n", err)
+		return
+	}
+
+	if args.GetIndex(1).MustInt(1) > 1 {
 		return
 	}
 
