@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/jrallison/go-workers"
@@ -22,14 +23,41 @@ import (
 type Analyzer struct {
 	exercism       *Exercism
 	analysseurHost string
+	comments       map[string][]byte
 }
 
 // NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
-func NewAnalyzer(exercism *Exercism, analysseur string) *Analyzer {
+func NewAnalyzer(exercism *Exercism, analysseur, dir string) (*Analyzer, error) {
+	dir = filepath.Join(dir, "analyzer", "ruby")
+
+	comments := make(map[string][]byte)
+
+	fn := func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		b, err := read(path)
+		if err != nil {
+			return err
+		}
+		r := strings.NewReplacer(dir, "", ".md", "")
+		key := r.Replace(path)
+		key = strings.TrimLeft(key, "/")
+
+		comments[key] = b
+
+		return nil
+	}
+
+	if err := filepath.Walk(dir, fn); err != nil {
+		return nil, err
+	}
+
 	return &Analyzer{
 		exercism:       exercism,
 		analysseurHost: analysseur,
-	}
+		comments:       comments,
+	}, nil
 }
 
 type analysisResult struct {
@@ -111,37 +139,27 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		return
 	}
 
+	var comments [][]byte
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)
 	for _, result := range ap.Results {
 		for _, key := range result.Keys {
 			sanity.Printf("%s : %s - %s\n", submissionUuid, result.Type, key)
-		}
-	}
 
-	// Step 3: Find comments based on analysis result
-	// We are loading the results before choosing a comment at random
-	// since not all results will have an associated comment, and it's
-	// better to be a bit wasteful than to not submit a comment when
-	// we could have.
-	var comments [][]byte
-	for _, result := range ap.Results {
-		for _, key := range result.Keys {
-			c := NewAnalyzerComment("", solution.TrackID, result.Type, key)
-			b, err := c.Bytes()
-			if err != nil {
-				lgr.Printf("We probably need to add a comment at %s - %s\n", c.path, err)
-			}
+			key := filepath.Join(result.Type, key)
+			b := analyzer.comments[key]
+
 			if len(b) > 0 {
 				comments = append(comments, b)
 			}
 		}
 	}
+
 	if len(comments) == 0 {
 		// no comments, bailing
 		return
 	}
 
-	// Step 4: submit random comment to exercism.io api
+	// Step 3: submit random comment to exercism.io api
 	comment := comments[rand.Intn(len(comments))]
 	if err := analyzer.exercism.SubmitComment(comment, submissionUuid); err != nil {
 		lgr.Printf("%s\n", err)
