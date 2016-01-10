@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// Host is the base URL for the analysseur API.
 var Host string
 
 type result struct {
@@ -23,6 +24,7 @@ type payload struct {
 	Error   string   `json:"error"`
 }
 
+// Analyze detects a specific set of code smells in Ruby code.
 func Analyze(files map[string]string) ([]string, error) {
 	var sources []string
 	for _, source := range files {
