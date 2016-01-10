@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/exercism/rikki/analysis/golang"
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
 )
@@ -19,6 +20,8 @@ type Analyzer struct {
 	exercism *Exercism
 	comments map[string]map[string][]byte
 }
+
+type analyzeFunc func(map[string]string) ([]string, error)
 
 // NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
 // We load the comments from disc when we create the analyzer.
@@ -75,25 +78,27 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		lgr.Printf("unable to determine submission key - %s\n", err)
 		return
 	}
-
 	solution, err := analyzer.exercism.FetchSolution(uuid)
 	if err != nil {
 		lgr.Printf("%s\n", err)
 		return
 	}
 
-	var smells []string
-
+	// Detect known smells.
+	var fn analyzeFunc
 	switch solution.TrackID {
 	case "ruby":
-		var err error
-		smells, err = ruby.Analyze(solution.Files)
-		if err != nil {
-			lgr.Printf("%s - %s", uuid, err)
-			return
-		}
+		fn = ruby.Analyze
+	case "go":
+		fn = golang.Analyze
 	default:
 		lgr.Printf("skipping - rikki- doesn't support %s\n", solution.TrackID)
+		return
+	}
+	smells, err := fn(solution.Files)
+	if err != nil {
+		lgr.Printf("%s - %s", uuid, err)
+		return
 	}
 
 	// Log what we found.
