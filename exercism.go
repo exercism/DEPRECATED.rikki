@@ -32,7 +32,7 @@ type commentBody struct {
 // Solution is an iteration of a specific problem in a particular language.
 type Solution struct {
 	TrackID string
-	Sources []string
+	Files   map[string]string
 }
 
 // FetchSolution fetches the code of a solution from the exercism API.
@@ -61,11 +61,7 @@ func (e *Exercism) FetchSolution(uuid string) (*Solution, error) {
 		return nil, fmt.Errorf("%s - %s\n", uuid, err)
 	}
 
-	var sources []string
-	for _, source := range cp.SolutionFiles {
-		sources = append(sources, source)
-	}
-	return &Solution{TrackID: cp.TrackID, Sources: sources}, nil
+	return &Solution{TrackID: cp.TrackID, Files: cp.SolutionFiles}, nil
 }
 
 // SubmitComment submits a rikki- comment to a particular submission via the exercism API.

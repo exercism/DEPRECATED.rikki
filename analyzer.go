@@ -87,12 +87,17 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		return
 	}
 
+	var sources []string
+	for _, source := range solution.Files {
+		sources = append(sources, source)
+	}
+
 	// Step 2: submit code to analysseur
 	url := fmt.Sprintf("%s/analyze/%s", analyzer.analysseurHost, solution.TrackID)
 	codeBody := struct {
 		Code string `json:"code"`
 	}{
-		strings.Join(solution.Sources, "\n"),
+		strings.Join(sources, "\n"),
 	}
 	codeBodyJSON, err := json.Marshal(codeBody)
 	if err != nil {
