@@ -22,7 +22,7 @@ type Analyzer struct {
 
 // NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
 func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
-	dir = filepath.Join(dir, "analyzer", "ruby")
+	dir = filepath.Join(dir, "analyzer")
 
 	comments := make(map[string]map[string][]byte)
 	comments["ruby"] = make(map[string][]byte)
@@ -35,11 +35,8 @@ func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
 		if err != nil {
 			return err
 		}
-		r := strings.NewReplacer(dir, "", ".md", "")
-		key := r.Replace(path)
-		key = strings.TrimLeft(key, "/")
-
-		comments["ruby"][key] = b
+		trackID, smell := identifyComment(dir, path)
+		comments[trackID][smell] = b
 
 		return nil
 	}
@@ -52,6 +49,19 @@ func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
 		exercism: exercism,
 		comments: comments,
 	}, nil
+}
+
+func identifyComment(dir, path string) (trackID, smell string) {
+	r := strings.NewReplacer(dir, "", ".md", "")
+	path = r.Replace(path)
+
+	segments := strings.Split(path, string(filepath.Separator))
+
+	if len(segments) < 2 {
+		return "", ""
+	}
+
+	return segments[1], strings.Join(segments[2:], string(filepath.Separator))
 }
 
 func (analyzer *Analyzer) process(msg *workers.Msg) {
