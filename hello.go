@@ -11,8 +11,8 @@ type Hello struct {
 }
 
 // NewHello configures a Hello job to talk to the exercism API.
-func NewHello(exercism *Exercism) (*Hello, error) {
-	b, err := NewHelloComment("").Bytes()
+func NewHello(exercism *Exercism, dir string) (*Hello, error) {
+	b, err := NewHelloComment(dir).Bytes()
 	if err != nil {
 		return nil, err
 	}

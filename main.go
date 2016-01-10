@@ -35,7 +35,7 @@ func main() {
 	analyzer := NewAnalyzer(exercism, *analysseurFlag)
 	workers.Process("analyze", analyzer.process, 4)
 
-	hello, err := NewHello(exercism)
+	hello, err := NewHello(exercism, commentDir())
 	if err != nil {
 		lgr.Print(err)
 		os.Exit(1)
