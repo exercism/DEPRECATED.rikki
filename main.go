@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/url"
@@ -71,4 +72,15 @@ func commentDir() string {
 		dir = "comments"
 	}
 	return dir
+}
+
+func read(path string) ([]byte, error) {
+	if _, err := os.Stat(path); err != nil {
+		return nil, err
+	}
+	b, err := ioutil.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	return b, nil
 }

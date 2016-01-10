@@ -1,6 +1,10 @@
 package main
 
-import "github.com/jrallison/go-workers"
+import (
+	"fmt"
+
+	"github.com/jrallison/go-workers"
+)
 
 // Hello is a job that provides encouragement after someone submits "Hello World".
 // The job receives the uuid of a submission and submits a comment from rikki-
@@ -12,7 +16,7 @@ type Hello struct {
 
 // NewHello configures a Hello job to talk to the exercism API.
 func NewHello(exercism *Exercism, dir string) (*Hello, error) {
-	b, err := NewHelloComment(dir).Bytes()
+	b, err := read(fmt.Sprintf("%s/hello/hello.md", dir))
 	if err != nil {
 		return nil, err
 	}
