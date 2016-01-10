@@ -21,11 +21,12 @@ type Analyzer struct {
 }
 
 // NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
+// We load the comments from disc when we create the analyzer.
+// This means that rikki- has to be restarted if we update the comments.
 func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
 	dir = filepath.Join(dir, "analyzer")
 
 	comments := make(map[string]map[string][]byte)
-	comments["ruby"] = make(map[string][]byte)
 
 	fn := func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
@@ -36,6 +37,9 @@ func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
 			return err
 		}
 		trackID, smell := identifyComment(dir, path)
+		if comments[trackID] == nil {
+			comments[trackID] = make(map[string][]byte)
+		}
 		comments[trackID][smell] = b
 
 		return nil
@@ -65,6 +69,7 @@ func identifyComment(dir, path string) (trackID, smell string) {
 }
 
 func (analyzer *Analyzer) process(msg *workers.Msg) {
+	// Fetch the solution from the Exercism API.
 	uuid, err := msg.Args().GetIndex(0).String()
 	if err != nil {
 		lgr.Printf("unable to determine submission key - %s\n", err)
@@ -91,12 +96,13 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		lgr.Printf("skipping - rikki- doesn't support %s\n", solution.TrackID)
 	}
 
+	// Log what we found.
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)
 	for _, smell := range smells {
 		sanity.Printf("%s : %s\n", uuid, smell)
 	}
 
-	// return the first available comment
+	// Select the first smell that we have a comment for.
 	var comment []byte
 	for _, smell := range smells {
 		b := analyzer.comments[solution.TrackID][smell]
@@ -106,12 +112,11 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 			break
 		}
 	}
-
 	if len(comment) == 0 {
 		return
 	}
 
-	// Step 3: submit random comment to exercism.io api
+	// Submit the comment back to the Exercism API.
 	if err := analyzer.exercism.SubmitComment(comment, uuid); err != nil {
 		lgr.Printf("%s\n", err)
 	}
