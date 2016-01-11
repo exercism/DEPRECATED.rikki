@@ -1,18 +1,26 @@
 package golang
 
 import (
+	"go/parser"
+	"go/token"
 	"io/ioutil"
 	"math/rand"
 	"os"
 	"os/exec"
 	"path"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
 )
 
 const (
-	smellFmt = "gofmt"
+	smellFmt  = "gofmt"
+	smellStub = "stub"
+)
+
+var (
+	rgxStub = regexp.MustCompile(`\bstub\b`)
 )
 
 func init() {
@@ -54,14 +62,24 @@ func Analyze(files map[string]string) ([]string, error) {
 	}
 	defer os.Remove(s.dir)
 
-	ok, err := isGofmted(s)
-	if err != nil {
-		return nil, err
+	smells := []string{}
+
+	detectors := map[string]func(*solution) (bool, error){
+		smellFmt:  isGofmted,
+		smellStub: isStubless,
 	}
-	if !ok {
-		return []string{smellFmt}, nil
+
+	for smell, fn := range detectors {
+		ok, err := fn(s)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
+			smells = append(smells, smell)
+		}
 	}
-	return nil, nil
+
+	return smells, nil
 }
 
 func isGofmted(s *solution) (bool, error) {
@@ -74,6 +92,22 @@ func isGofmted(s *solution) (bool, error) {
 	for name := range s.files {
 		for _, line := range lines {
 			if strings.HasSuffix(line, name) {
+				return false, nil
+			}
+		}
+	}
+	return true, nil
+}
+
+func isStubless(s *solution) (bool, error) {
+	for name, code := range s.files {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, name, code, parser.ParseComments)
+		if err != nil {
+			return false, err
+		}
+		for _, cg := range f.Comments {
+			if rgxStub.Match([]byte(cg.Text())) {
 				return false, nil
 			}
 		}
