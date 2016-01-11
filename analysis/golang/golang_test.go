@@ -50,6 +50,14 @@ func ok() bool {
 }
 `
 
+var codeBuild = `// +build !example
+package build
+
+func ok() bool {
+	return true
+}
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -103,6 +111,29 @@ func TestStubs(t *testing.T) {
 	}
 }
 
+func TestBuildDirective(t *testing.T) {
+	var tests = []struct {
+		desc, code string
+		ok         bool
+	}{
+		{"good", codeGood, true},
+		{"build", codeBuild, false},
+	}
+	for _, test := range tests {
+		s := &solution{
+			files: map[string]string{test.desc + `.go`: test.code},
+		}
+		ok, err := noBuildConstraint(s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok != test.ok {
+			t.Errorf("%s: got %t, want %t", test.desc, ok, !ok)
+		}
+	}
+
+}
+
 func TestAnalyze(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -111,6 +142,7 @@ func TestAnalyze(t *testing.T) {
 		{"good", codeGood, nil},
 		{"bad", codeBad, []string{"gofmt"}},
 		{"comment", codeStub, []string{"stub"}},
+		{"build", codeBuild, []string{"build-constraint"}},
 	}
 
 	for _, test := range tests {
