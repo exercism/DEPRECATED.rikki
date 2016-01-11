@@ -17,7 +17,7 @@ import (
 const (
 	smellFmt   = `gofmt`
 	smellStub  = `stub`
-	smellBuild = `+build !example`
+	smellBuild = `build-constraint`
 )
 
 var (

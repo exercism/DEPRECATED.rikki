@@ -2,6 +2,7 @@ package golang
 
 import (
 	"os"
+	"sort"
 	"testing"
 )
 
@@ -51,7 +52,7 @@ func ok() bool {
 `
 
 var codeBuild = `// +build !example
-package build
+package bc
 
 func ok() bool {
 	return true
@@ -152,6 +153,14 @@ func TestAnalyze(t *testing.T) {
 		}
 		if len(test.smells) != len(smells) {
 			t.Errorf("%s: got %v, want %v", test.desc, smells, test.smells)
+		}
+
+		sort.Strings(smells)
+		sort.Strings(test.smells)
+		for i := 0; i < len(test.smells); i++ {
+			if smells[i] != test.smells[i] {
+				t.Errorf("%s: got %s, want %v", test.desc, smells[i], test.smells[i])
+			}
 		}
 	}
 }
