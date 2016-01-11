@@ -13,7 +13,7 @@ import (
 
 // Analyzer is a job that provides feedback on specific issues in the code.
 // The job receives the uuid of a submission, calls the exercism API to get
-// the code, submits the code to analysseur for static analysis, and then,
+// the code, submits the code for static analysis, and then,
 // based on the results, chooses a response to submit as a comment from rikki-
 // back to the conversation on exercism.
 type Analyzer struct {
@@ -23,7 +23,7 @@ type Analyzer struct {
 
 type analyzeFunc func(map[string]string) ([]string, error)
 
-// NewAnalyzer configures an analyzer job to talk to the exercism and analysseur APIs.
+// NewAnalyzer configures an analyzer job to talk to the exercism and whatever analysis APIs we're using.
 // We load the comments from disc when we create the analyzer.
 // This means that rikki- has to be restarted if we update the comments.
 func NewAnalyzer(exercism *Exercism, dir string) (*Analyzer, error) {
