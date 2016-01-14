@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
@@ -18,6 +19,10 @@ const (
 	smellFmt   = `gofmt`
 	smellStub  = `stub`
 	smellBuild = `build-constraint`
+	smellCase  = `mixed-caps`
+
+	msgAllCaps   = `don't use ALL_CAPS in Go names`
+	msgSnakeCase = `don't use underscores in Go names`
 )
 
 var (
@@ -69,6 +74,7 @@ func Analyze(files map[string]string) ([]string, error) {
 		smellFmt:   isGofmted,
 		smellStub:  isStubless,
 		smellBuild: noBuildConstraint,
+		smellCase:  usesMixedCaps,
 	}
 
 	for smell, fn := range detectors {
@@ -121,6 +127,21 @@ func noBuildConstraint(s *solution) (bool, error) {
 	}
 	for _, c := range comments {
 		if strings.Contains(c, `+build !example`) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func usesMixedCaps(s *solution) (bool, error) {
+	output, err := exec.Command("golint", filepath.Join(s.dir, `...`)).CombinedOutput()
+	if err != nil {
+		return false, err
+	}
+
+	lines := strings.Split(string(output), "\n")
+	for _, line := range lines {
+		if strings.Contains(line, msgSnakeCase) || strings.Contains(line, msgAllCaps) {
 			return false, nil
 		}
 	}
