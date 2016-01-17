@@ -89,9 +89,7 @@ func TestGofmted(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		s := &solution{
-			files: map[string]string{"code.go": test.code},
-		}
+		s := newSolution(map[string]string{"code.go": test.code})
 		if err := s.write(); err != nil {
 			t.Fatal(err)
 		}
@@ -118,9 +116,7 @@ func TestStubs(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		s := &solution{
-			files: map[string]string{test.desc + `.go`: test.code},
-		}
+		s := newSolution(map[string]string{test.desc + `.go`: test.code})
 		ok, err := isStubless(s)
 		if err != nil {
 			t.Fatal(err)
@@ -140,9 +136,7 @@ func TestBuildDirective(t *testing.T) {
 		{"build", codeBuild, false},
 	}
 	for _, test := range tests {
-		s := &solution{
-			files: map[string]string{test.desc + `.go`: test.code},
-		}
+		s := newSolution(map[string]string{test.desc + `.go`: test.code})
 		ok, err := noBuildConstraint(s)
 		if err != nil {
 			t.Fatal(err)
@@ -163,9 +157,7 @@ func TestMixedCase(t *testing.T) {
 		{"scream", codeScream, false},
 	}
 	for _, test := range tests {
-		s := &solution{
-			files: map[string]string{test.desc + `.go`: test.code},
-		}
+		s := newSolution(map[string]string{test.desc + `.go`: test.code})
 		if err := s.write(); err != nil {
 			t.Fatal(err)
 		}
