@@ -14,6 +14,7 @@ import (
 
 const (
 	smellFmt   = `gofmt`
+	smellVet   = `go-vet`
 	smellStub  = `stub`
 	smellBuild = `build-constraint`
 	smellCase  = `mixed-caps`
@@ -42,6 +43,7 @@ func Analyze(files map[string]string) ([]string, error) {
 
 	detectors := map[string]func(*solution) (bool, error){
 		smellFmt:   isGofmted,
+		smellVet:   isVetted,
 		smellStub:  isStubless,
 		smellBuild: noBuildConstraint,
 		smellCase:  usesMixedCaps,
@@ -75,6 +77,19 @@ func isGofmted(s *solution) (bool, error) {
 		}
 	}
 	return true, nil
+}
+
+func isVetted(s *solution) (bool, error) {
+	pwd, err := os.Getwd()
+	if err != nil {
+		return false, err
+	}
+	defer os.Chdir(pwd)
+
+	os.Chdir(s.dir)
+
+	output, _ := exec.Command("go", "vet", `./...`).CombinedOutput()
+	return string(output) == "", nil
 }
 
 func isStubless(s *solution) (bool, error) {

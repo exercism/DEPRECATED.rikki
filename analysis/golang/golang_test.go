@@ -34,6 +34,14 @@ func ok() {
 	println(3%2 == 0)
 }`
 
+var codeUnreachable = `package vet
+
+func ok() bool {
+	return true
+	return false
+}
+`
+
 var codeStub = `// This is a stub file
 package main
 
@@ -60,6 +68,7 @@ func ok() bool {
 `
 
 var codeBuild = `// +build !example
+
 package bc
 
 func ok() bool {
@@ -105,6 +114,32 @@ func TestGofmted(t *testing.T) {
 		defer os.Remove(s.dir)
 
 		ok, err := isGofmted(s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if ok != test.ok {
+			t.Errorf("%s: got %t, want %t", test.desc, ok, !ok)
+		}
+	}
+}
+
+func TestVetted(t *testing.T) {
+	var tests = []struct {
+		desc, code string
+		ok         bool
+	}{
+		{"good", codeGood, true},
+		{"unreachable", codeUnreachable, false},
+	}
+
+	for _, test := range tests {
+		s := newSolution(map[string]string{"code.go": test.code})
+		if err := s.write(); err != nil {
+			t.Fatal(err)
+		}
+		defer os.Remove(s.dir)
+
+		ok, err := isVetted(s)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -192,6 +227,7 @@ func TestAnalyze(t *testing.T) {
 		{"comment", codeStub, []string{"stub"}},
 		{"build", codeBuild, []string{"build-constraint"}},
 		{"snake", codeSnake, []string{"mixed-caps"}},
+		{"unreachable", codeUnreachable, []string{"go-vet"}},
 	}
 
 	for _, test := range tests {
