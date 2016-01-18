@@ -23,10 +23,12 @@ func newSolution(m map[string]string) *solution {
 		name = strings.Replace(name, `/`, string(filepath.Separator), -1)
 		name = `/` + strings.TrimLeft(name, `/`)
 
-		// Fix any potential trailing newline issues.
+		// Fix potential issues with leading or trailing newlines.
 		// These wouldn't be visible to a reviewer, and if they're not
 		// running gofmt, then eventually we'll catch it with a more obvious problem.
-		files[name] = strings.TrimRight(code, "\n") + "\n"
+		code = strings.TrimRight(code, "\n") + "\n"
+		code = strings.TrimLeft(code, "\n")
+		files[name] = code
 	}
 
 	return &solution{

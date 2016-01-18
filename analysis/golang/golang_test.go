@@ -20,7 +20,15 @@ func ok() {
 }
 `
 
-var codeNewline = `package nl
+var codeNewlineBefore = `
+package nl
+
+func ok() {
+	println(3%2 == 0)
+}
+`
+
+var codeNewlineAfter = `package nl
 
 func ok() {
 	println(3%2 == 0)
@@ -85,7 +93,8 @@ func TestGofmted(t *testing.T) {
 	}{
 		{"good", codeGood, true},
 		{"bad", codeBad, false},
-		{"newline", codeNewline, true},
+		{"top", codeNewlineBefore, true},
+		{"bottom", codeNewlineAfter, true},
 	}
 
 	for _, test := range tests {
