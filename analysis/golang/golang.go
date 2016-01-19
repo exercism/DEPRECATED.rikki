@@ -19,9 +19,11 @@ const (
 	smellBuild = `build-constraint`
 	smellCase  = `mixed-caps`
 	smellZero  = `zero-value`
+	smellElse  = `if-return-else`
 
 	msgAllCaps   = `don't use ALL_CAPS in Go names`
 	msgSnakeCase = `don't use underscores in Go names`
+	msgOutdent   = `if block ends with a return statement, so drop this else and outdent its block`
 )
 
 var (
@@ -141,6 +143,9 @@ func lint(s *solution) ([]string, error) {
 		}
 		if isZeroValue(line) {
 			m[smellZero] = true
+		}
+		if strings.Contains(line, msgOutdent) {
+			m[smellElse] = true
 		}
 	}
 	var smells []string

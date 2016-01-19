@@ -100,6 +100,17 @@ var codeZero = `package zero
 var i int = 0
 `
 
+var codeOutdent = `package outdent
+
+func ok(i int) bool {
+	if i == 0 {
+		return true
+	} else {
+		return false
+	}
+}
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -209,6 +220,7 @@ func TestAnalyze(t *testing.T) {
 		{"scream", codeScream, []string{"mixed-caps"}},
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
 		{"zero", codeZero, []string{"zero-value"}},
+		{"outdent", codeOutdent, []string{"if-return-else"}},
 	}
 
 	for _, test := range tests {
