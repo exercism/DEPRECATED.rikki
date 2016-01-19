@@ -95,6 +95,11 @@ var codeScream = `package scream
 const SCREAMING_SNAKE = "scream"
 `
 
+var codeZero = `package zero
+
+var i int = 0
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -203,6 +208,7 @@ func TestAnalyze(t *testing.T) {
 		{"snake", codeSnake, []string{"mixed-caps"}},
 		{"scream", codeScream, []string{"mixed-caps"}},
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
+		{"zero", codeZero, []string{"zero-value"}},
 	}
 
 	for _, test := range tests {

@@ -18,6 +18,7 @@ const (
 	smellStub  = `stub`
 	smellBuild = `build-constraint`
 	smellCase  = `mixed-caps`
+	smellZero  = `zero-value`
 
 	msgAllCaps   = `don't use ALL_CAPS in Go names`
 	msgSnakeCase = `don't use underscores in Go names`
@@ -25,6 +26,7 @@ const (
 
 var (
 	rgxStub = regexp.MustCompile(`\bstub\b`)
+	rgxZero = regexp.MustCompile(`should drop.*from declaration of.*it is the zero value`)
 )
 
 func init() {
@@ -137,6 +139,9 @@ func lint(s *solution) ([]string, error) {
 		if isMixedCaps(line) {
 			m[smellCase] = true
 		}
+		if isZeroValue(line) {
+			m[smellZero] = true
+		}
 	}
 	var smells []string
 	for smell := range m {
@@ -148,6 +153,10 @@ func lint(s *solution) ([]string, error) {
 
 func isMixedCaps(msg string) bool {
 	return strings.Contains(msg, msgSnakeCase) || strings.Contains(msg, msgAllCaps)
+}
+
+func isZeroValue(msg string) bool {
+	return rgxZero.Match([]byte(msg))
 }
 
 func astComments(s *solution) ([]string, error) {
