@@ -85,7 +85,7 @@ func snake_case() bool {
 
 var codeMixed = `package mixed
 
-func mixedCase() bool {
+func mixedCaps() bool {
 	return true
 }
 `
@@ -191,32 +191,6 @@ func TestBuildDirective(t *testing.T) {
 	}
 }
 
-func TestMixedCase(t *testing.T) {
-	var tests = []struct {
-		desc, code string
-		ok         bool
-	}{
-		{"mixed", codeMixed, true},
-		{"snake", codeSnake, false},
-		{"scream", codeScream, false},
-	}
-	for _, test := range tests {
-		s := newSolution(map[string]string{test.desc + `.go`: test.code})
-		if err := s.write(); err != nil {
-			t.Fatal(err)
-		}
-		defer os.Remove(s.dir)
-
-		ok, err := usesMixedCaps(s)
-		if err != nil {
-			t.Fatal(err)
-		}
-		if ok != test.ok {
-			t.Errorf("%s: got %t, want %t", test.desc, ok, !ok)
-		}
-	}
-}
-
 func TestAnalyze(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -227,6 +201,7 @@ func TestAnalyze(t *testing.T) {
 		{"comment", codeStub, []string{"stub"}},
 		{"build", codeBuild, []string{"build-constraint"}},
 		{"snake", codeSnake, []string{"mixed-caps"}},
+		{"scream", codeScream, []string{"mixed-caps"}},
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
 	}
 

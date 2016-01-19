@@ -46,7 +46,6 @@ func Analyze(files map[string]string) ([]string, error) {
 		smellVet:   isVetted,
 		smellStub:  isStubless,
 		smellBuild: noBuildConstraint,
-		smellCase:  usesMixedCaps,
 	}
 
 	for smell, fn := range detectors {
@@ -58,6 +57,14 @@ func Analyze(files map[string]string) ([]string, error) {
 			smells = append(smells, smell)
 		}
 	}
+	linted, err := lint(s)
+	if err != nil {
+		if len(smells) > 0 {
+			return smells, nil
+		}
+		return nil, err
+	}
+	smells = append(smells, linted...)
 
 	return smells, nil
 }
@@ -118,19 +125,29 @@ func noBuildConstraint(s *solution) (bool, error) {
 	return true, nil
 }
 
-func usesMixedCaps(s *solution) (bool, error) {
+func lint(s *solution) ([]string, error) {
 	output, err := exec.Command("golint", filepath.Join(s.dir, `...`)).CombinedOutput()
 	if err != nil {
-		return false, err
+		return nil, err
 	}
 
 	lines := strings.Split(string(output), "\n")
+	m := map[string]bool{}
 	for _, line := range lines {
-		if strings.Contains(line, msgSnakeCase) || strings.Contains(line, msgAllCaps) {
-			return false, nil
+		if isMixedCaps(line) {
+			m[smellCase] = true
 		}
 	}
-	return true, nil
+	var smells []string
+	for smell := range m {
+		smells = append(smells, smell)
+	}
+
+	return smells, nil
+}
+
+func isMixedCaps(msg string) bool {
+	return strings.Contains(msg, msgSnakeCase) || strings.Contains(msg, msgAllCaps)
 }
 
 func astComments(s *solution) ([]string, error) {
