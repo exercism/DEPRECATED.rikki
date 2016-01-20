@@ -111,6 +111,22 @@ func ok(i int) bool {
 }
 `
 
+var codeIncrement = `package incr
+
+func up(x int) int {
+	x += 1
+	return x
+}
+`
+
+var codeDecrement = `package decr
+
+func down(n int) int {
+	n -= 1
+	return n
+}
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -221,6 +237,8 @@ func TestAnalyze(t *testing.T) {
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
 		{"zero", codeZero, []string{"zero-value"}},
 		{"outdent", codeOutdent, []string{"if-return-else"}},
+		{"increment", codeIncrement, []string{"increment-decrement"}},
+		{"decrement", codeDecrement, []string{"increment-decrement"}},
 	}
 
 	for _, test := range tests {
@@ -234,7 +252,7 @@ func TestAnalyze(t *testing.T) {
 
 		sort.Strings(smells)
 		sort.Strings(test.smells)
-		for i := 0; i < len(test.smells); i++ {
+		for i := 0; i < len(test.smells) && i < len(smells); i++ {
 			if smells[i] != test.smells[i] {
 				t.Errorf("%s: got %s, want %v", test.desc, smells[i], test.smells[i])
 			}
