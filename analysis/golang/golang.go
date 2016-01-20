@@ -13,15 +13,14 @@ import (
 )
 
 const (
-	smellFmt      = `gofmt`
-	smellVet      = `go-vet`
-	smellStub     = `stub`
-	smellBuild    = `build-constraint`
-	smellCase     = `mixed-caps`
-	smellZero     = `zero-value`
-	smellElse     = `if-return-else`
-	smellPostfix  = `increment-decrement`
-	smellDuration = `duration`
+	smellFmt     = `gofmt`
+	smellVet     = `go-vet`
+	smellStub    = `stub`
+	smellBuild   = `build-constraint`
+	smellCase    = `mixed-caps`
+	smellZero    = `zero-value`
+	smellElse    = `if-return-else`
+	smellPostfix = `increment-decrement`
 
 	msgAllCaps   = `don't use ALL_CAPS in Go names`
 	msgSnakeCase = `don't use underscores in Go names`
@@ -29,11 +28,10 @@ const (
 )
 
 var (
-	rgxStub     = regexp.MustCompile(`\bstub\b`)
-	rgxZero     = regexp.MustCompile(`should drop.*from declaration of.*it is the zero value`)
-	rgxIncr     = regexp.MustCompile(`should replace.*\+\+$`)
-	rgxDecr     = regexp.MustCompile(`should replace .*-= 1 with .*--`)
-	rgxDuration = regexp.MustCompile(`of type time.Duration; don't use unit-specific suffix`)
+	rgxStub = regexp.MustCompile(`\bstub\b`)
+	rgxZero = regexp.MustCompile(`should drop.*from declaration of.*it is the zero value`)
+	rgxIncr = regexp.MustCompile(`should replace.*\+\+$`)
+	rgxDecr = regexp.MustCompile(`should replace .*-= 1 with .*--`)
 )
 
 func init() {
@@ -155,10 +153,6 @@ func lint(s *solution) ([]string, error) {
 		if usePostfix(line) {
 			m[smellPostfix] = true
 		}
-		if unitSpecificDuration(line) {
-			m[smellDuration] = true
-		}
-
 	}
 	var smells []string
 	for smell := range m {
@@ -178,10 +172,6 @@ func isZeroValue(msg string) bool {
 
 func usePostfix(msg string) bool {
 	return rgxIncr.Match([]byte(msg)) || rgxDecr.Match([]byte(msg))
-}
-
-func unitSpecificDuration(msg string) bool {
-	return rgxDuration.Match([]byte(msg))
 }
 
 func astComments(s *solution) ([]string, error) {
