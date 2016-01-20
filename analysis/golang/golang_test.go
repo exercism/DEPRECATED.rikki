@@ -127,6 +127,13 @@ func down(n int) int {
 }
 `
 
+var codeDuration = `package sec
+
+import "time"
+
+var soManySeconds time.Duration
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -239,6 +246,7 @@ func TestAnalyze(t *testing.T) {
 		{"outdent", codeOutdent, []string{"if-return-else"}},
 		{"increment", codeIncrement, []string{"increment-decrement"}},
 		{"decrement", codeDecrement, []string{"increment-decrement"}},
+		{"duration", codeDuration, []string{"duration"}},
 	}
 
 	for _, test := range tests {
