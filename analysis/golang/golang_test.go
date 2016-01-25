@@ -34,6 +34,8 @@ func ok() {
 	println(3%2 == 0)
 }`
 
+var codeWindowsNewline = "package win\r\n\r\nimport \"time\"\r\n\r\nconst a = 1"
+
 var codeUnreachable = `package vet
 
 func ok() bool {
@@ -120,6 +122,7 @@ func TestGofmted(t *testing.T) {
 		{"bad", codeBad, false},
 		{"top", codeNewlineBefore, true},
 		{"bottom", codeNewlineAfter, true},
+		{"win", codeWindowsNewline, true},
 	}
 
 	for _, test := range tests {

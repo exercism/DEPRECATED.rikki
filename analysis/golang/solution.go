@@ -28,6 +28,7 @@ func newSolution(m map[string]string) *solution {
 		// running gofmt, then eventually we'll catch it with a more obvious problem.
 		code = strings.TrimRight(code, "\n") + "\n"
 		code = strings.TrimLeft(code, "\n")
+		code = strings.Replace(code, "\r\n", "\n", -1)
 		files[name] = code
 	}
 
