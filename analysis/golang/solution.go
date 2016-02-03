@@ -23,18 +23,21 @@ func newSolution(m map[string]string) *solution {
 		name = strings.Replace(name, `/`, string(filepath.Separator), -1)
 		name = `/` + strings.TrimLeft(name, `/`)
 
-		// Fix potential issues with leading or trailing newlines.
-		// These wouldn't be visible to a reviewer, and if they're not
-		// running gofmt, then eventually we'll catch it with a more obvious problem.
-		code = strings.TrimRight(code, "\n") + "\n"
-		code = strings.TrimLeft(code, "\n")
-		code = strings.Replace(code, "\r\n", "\n", -1)
-		files[name] = code
+		files[name] = normalizeSource(code)
 	}
 
 	return &solution{
 		files: files,
 	}
+}
+
+// Fix potential issues with leading or trailing newlines.
+// These wouldn't be visible to a reviewer, and if they're not
+// running gofmt, then eventually we'll catch it with a more obvious problem.
+func normalizeSource(code string) string {
+	code = strings.TrimRight(code, "\n") + "\n"
+	code = strings.TrimLeft(code, "\n")
+	return strings.Replace(code, "\r\n", "\n", -1)
 }
 
 func (s *solution) write() error {
