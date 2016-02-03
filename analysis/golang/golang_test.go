@@ -15,6 +15,7 @@ func ok() {
 
 var codeGood = `package good
 
+// an instance in time
 func ok() {
 	println(3%2 == 0)
 }
@@ -110,6 +111,26 @@ func ok(i int) bool {
 	} else {
 		return false
 	}
+}
+`
+
+var codeInstanceBad = `package instance
+
+type thing int
+
+// Creates an instance of thing
+func New() thing {
+	return thing(0)
+}
+`
+
+var codeObjectBad = `package instance
+
+type thing int
+
+// generates a new thing object
+func New() thing {
+	return thing(0)
 }
 `
 
@@ -234,6 +255,8 @@ func TestAnalyze(t *testing.T) {
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
 		{"zero", codeZero, []string{"zero-value"}},
 		{"outdent", codeOutdent, []string{"if-return-else"}},
+		{"instance", codeInstanceBad, []string{"instance"}},
+		{"object", codeObjectBad, []string{"object"}},
 	}
 
 	for _, test := range tests {

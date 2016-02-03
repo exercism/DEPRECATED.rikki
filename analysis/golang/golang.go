@@ -12,13 +12,15 @@ import (
 )
 
 const (
-	smellFmt   = `gofmt`
-	smellVet   = `go-vet`
-	smellStub  = `stub`
-	smellBuild = `build-constraint`
-	smellCase  = `mixed-caps`
-	smellZero  = `zero-value`
-	smellElse  = `if-return-else`
+	smellFmt      = `gofmt`
+	smellVet      = `go-vet`
+	smellStub     = `stub`
+	smellBuild    = `build-constraint`
+	smellCase     = `mixed-caps`
+	smellZero     = `zero-value`
+	smellElse     = `if-return-else`
+	smellInstance = `instance`
+	smellObject   = `object`
 
 	msgAllCaps   = `don't use ALL_CAPS in Go names`
 	msgSnakeCase = `don't use underscores in Go names`
@@ -27,6 +29,10 @@ const (
 
 var (
 	rgxStub = regexp.MustCompile(`\bstub\b`)
+
+	oopRef      = `([Rr]eturn|[Cc]reate|[Gg]enerate|[Cc]onstruct|[Nn]ormalize|[Rr]epresent)`
+	rgxObject   = regexp.MustCompile(oopRef + `.*object`)
+	rgxInstance = regexp.MustCompile(oopRef + `.*instance`)
 )
 
 func init() {
@@ -48,10 +54,12 @@ func Analyze(files map[string]string) ([]string, error) {
 	smells := []string{}
 
 	detectors := map[string]func(*solution) (bool, error){
-		smellFmt:   isGofmted,
-		smellVet:   isVetted,
-		smellStub:  isStubless,
-		smellBuild: noBuildConstraint,
+		smellFmt:      isGofmted,
+		smellVet:      isVetted,
+		smellStub:     isStubless,
+		smellBuild:    noBuildConstraint,
+		smellInstance: noInstance,
+		smellObject:   noObject,
 	}
 
 	for smell, fn := range detectors {
@@ -117,6 +125,24 @@ func isStubless(s *solution) (bool, error) {
 func noBuildConstraint(s *solution) (bool, error) {
 	for _, c := range s.comments {
 		if strings.Contains(c, `+build !example`) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func noObject(s *solution) (bool, error) {
+	for _, c := range s.comments {
+		if rgxObject.MatchString(c) {
+			return false, nil
+		}
+	}
+	return true, nil
+}
+
+func noInstance(s *solution) (bool, error) {
+	for _, c := range s.comments {
+		if rgxInstance.MatchString(c) {
 			return false, nil
 		}
 	}
