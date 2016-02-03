@@ -1,3 +1,5 @@
 rikki
 rikki-linux-amd64
 golint
+data_exhaust_test.go
+analysis/golang/data_exhaust
