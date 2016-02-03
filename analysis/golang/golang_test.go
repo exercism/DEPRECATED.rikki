@@ -134,6 +134,20 @@ func New() thing {
 }
 `
 
+var codeReceiverName = `
+package consistent
+
+type Score int
+
+func (s1 Score) Incr() Score {
+	return s + 1
+}
+
+func (s2 Score) Decr() Score {
+	return s - 1
+}
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -257,6 +271,7 @@ func TestAnalyze(t *testing.T) {
 		{"outdent", codeOutdent, []string{"if-return-else"}},
 		{"instance", codeInstanceBad, []string{"instance"}},
 		{"object", codeObjectBad, []string{"object"}},
+		{"receiver name", codeReceiverName, []string{"receiver-name"}},
 	}
 
 	for _, test := range tests {

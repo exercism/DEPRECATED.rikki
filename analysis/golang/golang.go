@@ -12,19 +12,21 @@ import (
 )
 
 const (
-	smellFmt      = `gofmt`
-	smellVet      = `go-vet`
-	smellStub     = `stub`
-	smellBuild    = `build-constraint`
-	smellCase     = `mixed-caps`
-	smellZero     = `zero-value`
-	smellElse     = `if-return-else`
-	smellInstance = `instance`
-	smellObject   = `object`
+	smellFmt          = `gofmt`
+	smellVet          = `go-vet`
+	smellStub         = `stub`
+	smellBuild        = `build-constraint`
+	smellCase         = `mixed-caps`
+	smellZero         = `zero-value`
+	smellElse         = `if-return-else`
+	smellInstance     = `instance`
+	smellObject       = `object`
+	smellReceiverName = `receiver-name`
 
-	msgAllCaps   = `don't use ALL_CAPS in Go names`
-	msgSnakeCase = `don't use underscores in Go names`
-	msgOutdent   = `if block ends with a return statement, so drop this else and outdent its block`
+	msgAllCaps      = `don't use ALL_CAPS in Go names`
+	msgSnakeCase    = `don't use underscores in Go names`
+	msgOutdent      = `if block ends with a return statement, so drop this else and outdent its block`
+	msgReceiverName = `should be consistent with previous receiver name`
 )
 
 var (
@@ -165,8 +167,13 @@ func lintify(s *solution) ([]string, error) {
 			if problem.Category == "indent" {
 				m[smellElse] = true
 			}
-			if problem.Category == "naming" && isMixedCaps(problem.Text) {
-				m[smellCase] = true
+			if problem.Category == "naming" {
+				if isMixedCaps(problem.Text) {
+					m[smellCase] = true
+				}
+				if strings.Contains(problem.Text, msgReceiverName) {
+					m[smellReceiverName] = true
+				}
 			}
 		}
 	}
