@@ -180,6 +180,11 @@ func TestStubs(t *testing.T) {
 
 	for _, test := range tests {
 		s := newSolution(map[string]string{test.desc + `.go`: test.code})
+
+		if err := s.extractComments(); err != nil {
+			t.Fatal(err)
+		}
+
 		ok, err := isStubless(s)
 		if err != nil {
 			t.Fatal(err)
@@ -200,6 +205,11 @@ func TestBuildDirective(t *testing.T) {
 	}
 	for _, test := range tests {
 		s := newSolution(map[string]string{test.desc + `.go`: test.code})
+
+		if err := s.extractComments(); err != nil {
+			t.Fatal(err)
+		}
+
 		ok, err := noBuildConstraint(s)
 		if err != nil {
 			t.Fatal(err)

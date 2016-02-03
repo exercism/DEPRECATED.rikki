@@ -1,6 +1,8 @@
 package golang
 
 import (
+	"go/parser"
+	"go/token"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -11,8 +13,9 @@ import (
 )
 
 type solution struct {
-	files map[string]string
-	dir   string
+	files    map[string]string
+	comments []string
+	dir      string
 }
 
 func newSolution(m map[string]string) *solution {
@@ -55,6 +58,20 @@ func (s *solution) write() error {
 
 		if err := ioutil.WriteFile(filename, []byte(code), os.ModePerm); err != nil {
 			return err
+		}
+	}
+	return nil
+}
+
+func (s *solution) extractComments() error {
+	for name, code := range s.files {
+		fset := token.NewFileSet()
+		f, err := parser.ParseFile(fset, name, code, parser.ParseComments)
+		if err != nil {
+			return err
+		}
+		for _, cg := range f.Comments {
+			s.comments = append(s.comments, cg.Text())
 		}
 	}
 	return nil

@@ -1,8 +1,6 @@
 package golang
 
 import (
-	"go/parser"
-	"go/token"
 	"math/rand"
 	"os"
 	"os/exec"
@@ -42,6 +40,10 @@ func Analyze(files map[string]string) ([]string, error) {
 		return nil, err
 	}
 	defer os.Remove(s.dir)
+
+	if err := s.extractComments(); err != nil {
+		return nil, err
+	}
 
 	smells := []string{}
 
@@ -104,11 +106,7 @@ func isVetted(s *solution) (bool, error) {
 }
 
 func isStubless(s *solution) (bool, error) {
-	comments, err := astComments(s)
-	if err != nil {
-		return false, err
-	}
-	for _, c := range comments {
+	for _, c := range s.comments {
 		if rgxStub.Match([]byte(c)) {
 			return false, nil
 		}
@@ -117,11 +115,7 @@ func isStubless(s *solution) (bool, error) {
 }
 
 func noBuildConstraint(s *solution) (bool, error) {
-	comments, err := astComments(s)
-	if err != nil {
-		return false, err
-	}
-	for _, c := range comments {
+	for _, c := range s.comments {
 		if strings.Contains(c, `+build !example`) {
 			return false, nil
 		}
@@ -161,19 +155,4 @@ func lintify(s *solution) ([]string, error) {
 
 func isMixedCaps(msg string) bool {
 	return strings.Contains(msg, msgSnakeCase) || strings.Contains(msg, msgAllCaps)
-}
-
-func astComments(s *solution) ([]string, error) {
-	comments := []string{}
-	for name, code := range s.files {
-		fset := token.NewFileSet()
-		f, err := parser.ParseFile(fset, name, code, parser.ParseComments)
-		if err != nil {
-			return nil, err
-		}
-		for _, cg := range f.Comments {
-			comments = append(comments, cg.Text())
-		}
-	}
-	return comments, nil
 }
