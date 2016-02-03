@@ -6,10 +6,11 @@ import (
 	"math/rand"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/golang/lint"
 )
 
 const (
@@ -28,7 +29,6 @@ const (
 
 var (
 	rgxStub = regexp.MustCompile(`\bstub\b`)
-	rgxZero = regexp.MustCompile(`should drop.*from declaration of.*it is the zero value`)
 )
 
 func init() {
@@ -61,7 +61,7 @@ func Analyze(files map[string]string) ([]string, error) {
 			smells = append(smells, smell)
 		}
 	}
-	linted, err := lint(s)
+	linted, err := lintify(s)
 	if err != nil {
 		if len(smells) > 0 {
 			return smells, nil
@@ -129,25 +129,28 @@ func noBuildConstraint(s *solution) (bool, error) {
 	return true, nil
 }
 
-func lint(s *solution) ([]string, error) {
-	output, err := exec.Command("golint", filepath.Join(s.dir, `...`)).CombinedOutput()
-	if err != nil {
-		return nil, err
+func lintify(s *solution) ([]string, error) {
+	linter := &lint.Linter{}
+	m := map[string]bool{}
+
+	for filename, src := range s.files {
+		problems, err := linter.Lint(filename, []byte(src))
+		if err != nil {
+			return nil, err
+		}
+		for _, problem := range problems {
+			if problem.Category == "zero-value" {
+				m[smellZero] = true
+			}
+			if problem.Category == "indent" {
+				m[smellElse] = true
+			}
+			if problem.Category == "naming" && isMixedCaps(problem.Text) {
+				m[smellCase] = true
+			}
+		}
 	}
 
-	lines := strings.Split(string(output), "\n")
-	m := map[string]bool{}
-	for _, line := range lines {
-		if isMixedCaps(line) {
-			m[smellCase] = true
-		}
-		if isZeroValue(line) {
-			m[smellZero] = true
-		}
-		if strings.Contains(line, msgOutdent) {
-			m[smellElse] = true
-		}
-	}
 	var smells []string
 	for smell := range m {
 		smells = append(smells, smell)
@@ -158,10 +161,6 @@ func lint(s *solution) ([]string, error) {
 
 func isMixedCaps(msg string) bool {
 	return strings.Contains(msg, msgSnakeCase) || strings.Contains(msg, msgAllCaps)
-}
-
-func isZeroValue(msg string) bool {
-	return rgxZero.Match([]byte(msg))
 }
 
 func astComments(s *solution) ([]string, error) {
