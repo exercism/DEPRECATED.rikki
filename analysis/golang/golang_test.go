@@ -281,6 +281,7 @@ func TestAnalyze(t *testing.T) {
 		}
 		if len(test.smells) != len(smells) {
 			t.Errorf("%s: got %v, want %v", test.desc, smells, test.smells)
+			continue
 		}
 
 		sort.Strings(smells)
