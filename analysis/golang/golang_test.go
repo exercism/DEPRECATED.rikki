@@ -148,6 +148,26 @@ func (s2 Score) Decr() Score {
 }
 `
 
+var codeRangeSlice = `
+package loop
+
+func do() {
+	for i, _ := range []int{1, 1, 2, 3, 5} {
+		// do something
+	}
+}
+`
+
+var codeRangeMap = `
+package loop
+
+func do() {
+	for k, _ := range map[string]int{"alice": 9, "bob": 12} {
+		// do something
+	}
+}
+`
+
 func TestGofmted(t *testing.T) {
 	var tests = []struct {
 		desc, code string
@@ -272,6 +292,8 @@ func TestAnalyze(t *testing.T) {
 		{"instance", codeInstanceBad, []string{"instance"}},
 		{"object", codeObjectBad, []string{"object"}},
 		{"receiver name", codeReceiverName, []string{"receiver-name"}},
+		{"range with map", codeRangeMap, []string{"range-loop"}},
+		{"range with slice", codeRangeSlice, []string{"range-loop"}},
 	}
 
 	for _, test := range tests {

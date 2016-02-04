@@ -22,6 +22,7 @@ const (
 	smellInstance     = `instance`
 	smellObject       = `object`
 	smellReceiverName = `receiver-name`
+	smellRangeLoop    = `range-loop`
 
 	msgAllCaps      = `don't use ALL_CAPS in Go names`
 	msgSnakeCase    = `don't use underscores in Go names`
@@ -163,6 +164,9 @@ func lintify(s *solution) ([]string, error) {
 		for _, problem := range problems {
 			if problem.Category == "zero-value" {
 				m[smellZero] = true
+			}
+			if problem.Category == "range-loop" {
+				m[smellRangeLoop] = true
 			}
 			if problem.Category == "indent" {
 				m[smellElse] = true
