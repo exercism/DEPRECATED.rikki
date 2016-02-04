@@ -12,17 +12,18 @@ import (
 )
 
 const (
-	smellFmt          = `gofmt`
-	smellVet          = `go-vet`
-	smellStub         = `stub`
-	smellBuild        = `build-constraint`
-	smellCase         = `mixed-caps`
-	smellZero         = `zero-value`
-	smellElse         = `if-return-else`
-	smellInstance     = `instance`
-	smellObject       = `object`
-	smellReceiverName = `receiver-name`
-	smellRangeLoop    = `range-loop`
+	smellFmt           = `gofmt`
+	smellVet           = `go-vet`
+	smellStub          = `stub`
+	smellBuild         = `build-constraint`
+	smellCase          = `mixed-caps`
+	smellZero          = `zero-value`
+	smellElse          = `if-return-else`
+	smellInstance      = `instance`
+	smellObject        = `object`
+	smellReceiverName  = `receiver-name`
+	smellRangeLoop     = `range-loop`
+	smellCommentFormat = `doc-comment-format`
 
 	msgAllCaps      = `don't use ALL_CAPS in Go names`
 	msgSnakeCase    = `don't use underscores in Go names`
@@ -31,7 +32,8 @@ const (
 )
 
 var (
-	rgxStub = regexp.MustCompile(`\bstub\b`)
+	rgxStub            = regexp.MustCompile(`\bstub\b`)
+	rgxDocCommentWrong = regexp.MustCompile(`comment on exported.*should be of the form`)
 
 	oopRef      = `([Rr]eturn|[Cc]reate|[Gg]enerate|[Cc]onstruct|[Nn]ormalize|[Rr]epresent)`
 	rgxObject   = regexp.MustCompile(oopRef + `.*object`)
@@ -178,6 +180,9 @@ func lintify(s *solution) ([]string, error) {
 				if strings.Contains(problem.Text, msgReceiverName) {
 					m[smellReceiverName] = true
 				}
+			}
+			if problem.Category == "comments" && rgxDocCommentWrong.Match([]byte(problem.Text)) {
+				m[smellCommentFormat] = true
 			}
 		}
 	}

@@ -118,7 +118,7 @@ var codeInstanceBad = `package instance
 
 type thing int
 
-// Creates an instance of thing
+// New creates an instance of thing
 func New() thing {
 	return thing(0)
 }
@@ -128,7 +128,7 @@ var codeObjectBad = `package instance
 
 type thing int
 
-// generates a new thing object
+// New generates a new thing object
 func New() thing {
 	return thing(0)
 }
@@ -165,6 +165,15 @@ func do() {
 	for k, _ := range map[string]int{"alice": 9, "bob": 12} {
 		// do something
 	}
+}
+`
+
+var codeBadComment = `
+package doc
+
+// It's all good. Or perhaps not.
+func OK() bool {
+	return true
 }
 `
 
@@ -294,6 +303,7 @@ func TestAnalyze(t *testing.T) {
 		{"receiver name", codeReceiverName, []string{"receiver-name"}},
 		{"range with map", codeRangeMap, []string{"range-loop"}},
 		{"range with slice", codeRangeSlice, []string{"range-loop"}},
+		{"incorrect comment format", codeBadComment, []string{"doc-comment-format"}},
 	}
 
 	for _, test := range tests {
