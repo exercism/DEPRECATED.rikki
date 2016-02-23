@@ -303,7 +303,7 @@ func TestAnalyze(t *testing.T) {
 		{"receiver name", codeReceiverName, []string{"receiver-name"}},
 		{"range with map", codeRangeMap, []string{"range-loop"}},
 		{"range with slice", codeRangeSlice, []string{"range-loop"}},
-		{"incorrect comment format", codeBadComment, []string{"doc-comment-format"}},
+		{"incorrect comment format", codeBadComment, []string{"comment-format"}},
 	}
 
 	for _, test := range tests {

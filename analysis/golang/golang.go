@@ -23,12 +23,13 @@ const (
 	smellObject        = `object`
 	smellReceiverName  = `receiver-name`
 	smellRangeLoop     = `range-loop`
-	smellCommentFormat = `doc-comment-format`
+	smellCommentFormat = `comment-format`
 
-	msgAllCaps      = `don't use ALL_CAPS in Go names`
-	msgSnakeCase    = `don't use underscores in Go names`
-	msgOutdent      = `if block ends with a return statement, so drop this else and outdent its block`
-	msgReceiverName = `should be consistent with previous receiver name`
+	msgAllCaps         = `don't use ALL_CAPS in Go names`
+	msgSnakeCase       = `don't use underscores in Go names`
+	msgOutdent         = `if block ends with a return statement, so drop this else and outdent its block`
+	msgReceiverName    = `should be consistent with previous receiver name`
+	msgPkgCommentWrong = `package comment should be of the form`
 )
 
 var (
@@ -181,7 +182,7 @@ func lintify(s *solution) ([]string, error) {
 					m[smellReceiverName] = true
 				}
 			}
-			if problem.Category == "comments" && rgxDocCommentWrong.Match([]byte(problem.Text)) {
+			if problem.Category == "comments" && badComment(problem.Text) {
 				m[smellCommentFormat] = true
 			}
 		}
@@ -193,6 +194,10 @@ func lintify(s *solution) ([]string, error) {
 	}
 
 	return smells, nil
+}
+
+func badComment(s string) bool {
+	return rgxDocCommentWrong.Match([]byte(s)) || strings.Contains(s, msgPkgCommentWrong)
 }
 
 func isMixedCaps(msg string) bool {
