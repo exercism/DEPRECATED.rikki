@@ -2,7 +2,6 @@ package golang
 
 import (
 	"os"
-	"sort"
 	"testing"
 )
 
@@ -76,6 +75,17 @@ package bc
 
 func ok() bool {
 	return true
+}
+`
+
+var codeNewbie = `// +build !example
+
+package newbie
+
+// This is a stub file
+
+func ok() {
+	println(3 % 2 == 0)
 }
 `
 
@@ -293,6 +303,7 @@ func TestAnalyze(t *testing.T) {
 		{"bad", codeBad, []string{"gofmt"}},
 		{"comment", codeStub, []string{"stub"}},
 		{"build", codeBuild, []string{"build-constraint"}},
+		{"newbie", codeNewbie, []string{"stub", "build-constraint", "gofmt"}},
 		{"snake", codeSnake, []string{"mixed-caps"}},
 		{"scream", codeScream, []string{"mixed-caps"}},
 		{"unreachable", codeUnreachable, []string{"go-vet"}},
@@ -316,8 +327,6 @@ func TestAnalyze(t *testing.T) {
 			continue
 		}
 
-		sort.Strings(smells)
-		sort.Strings(test.smells)
 		for i := 0; i < len(test.smells); i++ {
 			if smells[i] != test.smells[i] {
 				t.Errorf("%s: got %s, want %v", test.desc, smells[i], test.smells[i])

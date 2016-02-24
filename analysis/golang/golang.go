@@ -59,22 +59,25 @@ func Analyze(files map[string]string) ([]string, error) {
 
 	smells := []string{}
 
-	detectors := map[string]func(*solution) (bool, error){
-		smellFmt:      isGofmted,
-		smellVet:      isVetted,
-		smellStub:     isStubless,
-		smellBuild:    noBuildConstraint,
-		smellInstance: noInstance,
-		smellObject:   noObject,
+	detectors := []struct {
+		smell string
+		fn    func(*solution) (bool, error)
+	}{
+		{smellStub, isStubless},
+		{smellBuild, noBuildConstraint},
+		{smellFmt, isGofmted},
+		{smellVet, isVetted},
+		{smellInstance, noInstance},
+		{smellObject, noObject},
 	}
 
-	for smell, fn := range detectors {
-		ok, err := fn(s)
+	for _, detector := range detectors {
+		ok, err := detector.fn(s)
 		if err != nil {
 			return nil, err
 		}
 		if !ok {
-			smells = append(smells, smell)
+			smells = append(smells, detector.smell)
 		}
 	}
 	linted, err := lintify(s)
