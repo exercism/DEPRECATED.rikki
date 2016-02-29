@@ -1,4 +1,4 @@
-Go has [very clear guidelines](https://golang.org/doc/effective_go.html)
+Go has [great guidelines](https://golang.org/doc/effective_go.html)
 about how to write comments.
 
 The package comment should start with the word _Package_ followed by the package name.
