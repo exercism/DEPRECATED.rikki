@@ -1,5 +1,5 @@
-Rubyists tend to prefer enumerable methods over `for` loops. `for` loops affect variables
-outside of the iteration. Here's a good example:
+Rubyists tend to prefer methods over `for` loops. `for` loops
+affect variables outside of the iteration. Here's a good example:
 
 ```ruby
 person = 'alice'
@@ -9,11 +9,11 @@ end
 person #=> 'charlie'
 ```
 
-It's worth being aware of the Ruby enumerable methods, since there are some
-very powerful and expressive ones.
+It's worth being aware of the methods available for Ruby, since there are
+some very powerful and expressive ones.
 
-The most basic one is `Enumerable#each`, which can be used with enumerable
-objects like `Array` and `Hash`:
+The most basic one is `each`, which can be used with objects like
+`Array` and `Hash`:
 
 ```ruby
 ["alice", "bob", "charlie"].each do |name|
@@ -27,7 +27,7 @@ end
 end
 ```
 
-`Enumerable` methods do not affect surounding variables.
+These blocks do not affect surounding variables.
 
 ```ruby
 person = 'alice'
@@ -37,4 +37,8 @@ end
 person #=> 'alice'
 ```
 
-Check out [Enumerable](http://ruby-doc.org/core-2.1.2/Enumerable.html) to see what's available.
+Enumerable doesn't provide the `each` method, but it does require that
+it exists.
+
+Check out [Enumerable](http://ruby-doc.org/core/Enumerable.html) to
+learn more about it.
