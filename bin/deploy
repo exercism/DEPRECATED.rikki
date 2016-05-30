@@ -1,0 +1,15 @@
+#!/bin/bash
+
+path="/usr/local/rikki"
+now=$(date "+%Y%m%d%H%M%S")
+deploy="$path/deploy-$now"
+
+bin/build
+tar -cvzf deploy/comments.tar.gz comments
+
+ssh demogorgon "mkdir -p $deploy"
+scp deploy/comments.tar.gz demogorgon:$deploy
+scp deploy/rikki-linux-amd64 demogorgon:$deploy/rikki
+ssh demogorgon "tar xvfz $deploy/comments.tar.gz -C $deploy/"
+ssh demogorgon "unlink $path/current; ln -s $deploy $path/current"
+ssh demogorgon 'service rikki restart'
