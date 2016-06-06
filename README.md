@@ -1,6 +1,6 @@
 # Rikki
 
-Rikki is the friendly neighborhood robot nitpicker.
+Rikki is the friendly neighborhood robot code reviewer.
 
 Rikki's comments are open source, and we welcome improvements of all kinds.
 

@@ -66,7 +66,7 @@ func (e *Exercism) FetchSolution(uuid string) (*Solution, error) {
 
 // SubmitComment submits a rikki- comment to a particular submission via the exercism API.
 func (e *Exercism) SubmitComment(comment []byte, uuid string) error {
-	experiment := "_This is an automated nitpick. [Read more](http://exercism.io/rikki) about this experiment._"
+	experiment := "_This is an automated review based on lots and lots of real-life reviews. [Read more](http://exercism.io/rikki) about this experiment._"
 	s := fmt.Sprintf("%s\n-----\n%s", string(comment), experiment)
 
 	cb, err := json.Marshal(&commentBody{Comment: s})
