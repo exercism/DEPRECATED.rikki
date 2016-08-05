@@ -1,1 +1,1 @@
-The shebang (`#!`) at the beginning of the file means that it's meant to run as a shell script. The exercism exercises are not intended to be shell scripts, but rather little libraries that other programs could potentially require and run.
+The shebang (`#!`) at the beginning of the file means that it's meant to run as an executable script. The exercism exercises are not intended to be scripts, but rather little libraries that other programs could potentially require and run.
