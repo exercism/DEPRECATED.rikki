@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"github.com/exercism/rikki/analysis/golang"
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
+	"github.com/mhelmetag/rikki/analysis/crystal"
 )
 
 // Analyzer is a job that provides feedback on specific issues in the code.
@@ -91,6 +93,8 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		fn = ruby.Analyze
 	case "go":
 		fn = golang.Analyze
+	case "crystal":
+		fn = crystal.Analyze
 	default:
 		lgr.Printf("skipping - rikki- doesn't support %s\n", solution.TrackID)
 		return
@@ -100,6 +104,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		lgr.Printf("%s - %s", uuid, err)
 		return
 	}
+	fmt.Printf("%#v\n", smells)
 
 	// Log what we found.
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)

@@ -13,11 +13,13 @@ import (
 
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
+	"github.com/mhelmetag/rikki/analysis/crystal"
 )
 
 var redisFlag = flag.String("redis", "redis://localhost:6379/0/", "Redis database to read queue from")
 var exercismFlag = flag.String("exercism", "http://localhost:4567", "Url of exercism api, e.g. http://exercism.io")
 var analysseurFlag = flag.String("analysseur", "http://localhost:8989", "Url of analysseur api, e.g. http://analysseur.exercism.io")
+var crystalcfsFlag = flag.String("crystalcfs", "http://localhost:3000", "Url of exercism_cfs api, e.g. http://exercism_cfs.exercism.io")
 
 var lgr = log.New(os.Stdout, "ERROR: ", log.Ldate|log.Ltime|log.Lshortfile)
 
@@ -35,6 +37,7 @@ func main() {
 	exercism := NewExercism(*exercismFlag, NewAuth().Key())
 
 	ruby.Host = *analysseurFlag
+	crystal.Host = *crystalcfsFlag
 
 	analyzer, err := NewAnalyzer(exercism, commentDir())
 	if err != nil {
