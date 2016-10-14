@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -104,7 +103,6 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		lgr.Printf("%s - %s", uuid, err)
 		return
 	}
-	fmt.Printf("%#v\n", smells)
 
 	// Log what we found.
 	sanity := log.New(os.Stdout, "SANITY: ", log.Ldate|log.Ltime|log.Lshortfile)

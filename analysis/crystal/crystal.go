@@ -59,14 +59,11 @@ func Analyze(files map[string]string) ([]string, error) {
 		return nil, fmt.Errorf("%s responded with status %d - %s\n", url, resp.StatusCode, string(body))
 	}
 
-	fmt.Printf("%#v\n", string(body))
 	var res result
 	err = json.Unmarshal(body, &res)
 	if err != nil {
 		return nil, err
 	}
-
-	fmt.Printf("%#v\n", res)
 
 	if res.Error != "" {
 		return nil, errors.New(res.Error)

@@ -86,7 +86,7 @@ func (e *Exercism) SubmitComment(comment []byte, uuid string) error {
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
-		return fmt.Errorf("cannot read response body %v - %s", resp, err)
+		return fmt.Errorf("cannot read response body %#v - %s", resp, err)
 	}
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusNoContent {
