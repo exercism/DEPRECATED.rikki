@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/exercism/rikki/analysis/crystal"
 	"github.com/exercism/rikki/analysis/golang"
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
@@ -91,6 +92,8 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		fn = ruby.Analyze
 	case "go":
 		fn = golang.Analyze
+	case "crystal":
+		fn = crystal.Analyze
 	default:
 		lgr.Printf("skipping - rikki- doesn't support %s\n", solution.TrackID)
 		return
