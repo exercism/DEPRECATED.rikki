@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/exercism/rikki/analysis/crystal"
 	"github.com/exercism/rikki/analysis/golang"
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
-	"github.com/mhelmetag/rikki/analysis/crystal"
 )
 
 // Analyzer is a job that provides feedback on specific issues in the code.

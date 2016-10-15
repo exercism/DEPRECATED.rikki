@@ -11,9 +11,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/exercism/rikki/analysis/crystal"
 	"github.com/exercism/rikki/analysis/ruby"
 	"github.com/jrallison/go-workers"
-	"github.com/mhelmetag/rikki/analysis/crystal"
 )
 
 var redisFlag = flag.String("redis", "redis://localhost:6379/0/", "Redis database to read queue from")
