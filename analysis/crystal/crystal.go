@@ -80,7 +80,7 @@ func Analyze(files map[string]string) ([]string, error) {
 
 	var smells []string
 	for _, prob := range res.Problems {
-		if prob.Result == true {
+		if prob.Result {
 			smells = append(smells, prob.Type)
 		}
 	}
