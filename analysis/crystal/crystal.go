@@ -10,8 +10,12 @@ import (
 	"strings"
 )
 
-// Host is the base URL for the analysseur API.
-var Host string
+// Host is the base URL for the crystal-analyzer API.
+// Path is the endpoint for testing a file (default: "check").
+var (
+	Host string
+	Path = "check"
+)
 
 type request struct {
 	ID       string `json:"id"`
@@ -25,18 +29,18 @@ type response struct {
 }
 
 type problem struct {
-	Type   string `json:"type"`
-	Result string `json:"result"`
+	Type   string
+	Result bool `json:"result,string"`
 }
 
-// Analyze Crystal code for formatting errors (and other bad things maybe later)
+// Analyze Crystal code for formatting errors (and, possibly, other bad things later).
 func Analyze(files map[string]string) ([]string, error) {
 	var sources []string
 	for _, source := range files {
 		sources = append(sources, source)
 	}
 
-	url := fmt.Sprintf("%s/check", Host)
+	url := fmt.Sprintf("%s/%s", Host, Path)
 	code := strings.Join(sources, "\n")
 	requestBody := request{ID: "rikki", Contents: code}
 	requestBodyJSON, err := json.Marshal(requestBody)
@@ -76,7 +80,7 @@ func Analyze(files map[string]string) ([]string, error) {
 
 	var smells []string
 	for _, prob := range res.Problems {
-		if prob.Result == "true" {
+		if prob.Result == true {
 			smells = append(smells, prob.Type)
 		}
 	}
