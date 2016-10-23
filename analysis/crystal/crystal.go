@@ -29,8 +29,8 @@ type response struct {
 }
 
 type problem struct {
-	Type   string
-	Result bool `json:"result,string"`
+	Type   string `json:"type"`
+	Result bool   `json:"result,string"`
 }
 
 // Analyze Crystal code for formatting errors (and, possibly, other bad things later).
