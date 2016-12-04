@@ -3,7 +3,7 @@ language: go
 sudo: false
 
 go:
-  - 1.5
+  - 1.7
   - tip
 
 install: true
@@ -13,3 +13,7 @@ before_install:
 
 script:
   - go test ./...
+
+matrix:
+  allow_failures:
+    - go: tip
