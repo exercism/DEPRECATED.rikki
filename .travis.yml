@@ -13,3 +13,7 @@ before_install:
 
 script:
   - go test ./...
+
+matrix:
+  allow_failures:
+    - go: tip
