@@ -13,9 +13,14 @@ When someone submits a solution to exercism, the uuid of the submission gets
 placed in a queue implemented in redis.
 
 Rikki pulls the uuid off the queue, makes a request to exercism.io's API to get the
-code, then submits the code to the analysseur API.
+code, then either processes it locally, or submits the code to one of the analyzer APIs,
+depending on the language.
 
-Analysseur uses analyzers/rules defined in the [exercism-analysis repository](https://github.com/JacobNinja/exercism-analysis),
+* Go: analyzes locally
+* Crystal: submits it to the crystal analyzer
+* Ruby: submits it to the [ruby analyzer](https://github.com/exercism/rikki-ruby-analyzer)
+
+The Ruby analyzer uses analyzers/rules defined in the [exercism-analysis repository](https://github.com/JacobNinja/exercism-analysis),
 and responds with a list of violations. Each violation consists of type and a
 possible list of keys.
 
