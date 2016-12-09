@@ -60,7 +60,11 @@ By default the worker runs against
 These can be overridden using command-line flags:
 
 ```bash
-$ ./rikki -redis=redis://user:pass@host:port/db/ -exercism=http://exercism.io -crystal-analyzer=http://crystal-analyzer.exercism.io -analysseur=http://analysseur.exercism.io
+$ ./rikki \
+    -redis=redis://user:pass@host:port/db/ \
+    -exercism=http://exercism.io \
+    -crystal-analyzer=http://crystal-analyzer.exercism.io \
+    -analysseur=http://analysseur.exercism.io
 ```
 
 ## Enqueuing a Job
