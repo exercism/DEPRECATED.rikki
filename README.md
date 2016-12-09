@@ -55,7 +55,7 @@ By default the worker runs against
 - **redis**: localhost:6379
 - **exercism**: localhost:4567
 - **crystal-analyzer**: localhost:3000
-- **analysseur**: localhost:8989
+- **ruby-analyzer**: localhost:8989
 
 These can be overridden using command-line flags:
 
@@ -64,7 +64,7 @@ $ ./rikki \
     -redis=redis://user:pass@host:port/db/ \
     -exercism=http://exercism.io \
     -crystal-analyzer=http://crystal-analyzer.exercism.io \
-    -analysseur=http://analysseur.exercism.io
+    -ruby-analyzer=http://ruby-analyzer.exercism.io
 ```
 
 ## Enqueuing a Job

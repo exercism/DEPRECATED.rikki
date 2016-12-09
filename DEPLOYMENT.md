@@ -18,8 +18,8 @@ Logs can be found in `/var/log/upstart/rikki.log`.
 RIKKI_SECRET has to match the one in the exercism.io application that is running
 EXERCISM has to match the url of the exercism.io application
 REDIS has is where the jobs on queue 'analyze' are being taken from
-CRYSTAL_ANALYZER has to match the url of the crystal analizer API that is running
-ANALYSSEUR has to match the url of the analysseur application that is running
+CRYSTAL_ANALYZER has to match the url of the crystal analyzer API that is running
+RUBY_ANALYZER has to match the url of the ruby analyzer API that is running
 
 ## Upstart script
 
@@ -40,12 +40,12 @@ export EXERCISM=http://exercism.io
 export RIKKI_SECRET=<shared secret>
 export RIKKI_FEEDBACK_DIR=/usr/local/rikki/current/comments
 export CRYSTAL_ANALYZER=http://crystal-analyzer.exercism.io
-export ANALYSSEUR=http://analysseur.exercism.io
+export RUBY_ANALYZER=http://ruby-analyzer.exercism.io
 /usr/local/rikki/current/rikki \
     -exercism=$EXERCISM \
     -redis=$REDIS \
     -crystal-analyzer=$CRYSTAL_ANALYZER \
-    -analysseur=$ANALYSSEUR
+    -ruby-analyzer=$RUBY_ANALYZER
 end script
 ```
 

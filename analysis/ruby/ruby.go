@@ -12,7 +12,7 @@ import (
 	"strings"
 )
 
-// Host is the base URL for the analysseur API.
+// Host is the base URL for the Ruby analyzer API.
 var Host string
 
 type result struct {
@@ -31,7 +31,7 @@ func Analyze(files map[string]string) ([]string, error) {
 		sources = append(sources, source)
 	}
 
-	// Step 2: submit code to analysseur
+	// Step 2: submit code to the Ruby analyzer API.
 	url := fmt.Sprintf("%s/analyze/ruby", Host)
 	codeBody := struct {
 		Code string `json:"code"`
