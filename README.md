@@ -7,18 +7,16 @@ Rikki's comments are open source, and we welcome improvements of all kinds.
 If you find typos, or if something is poorly worded, confusing, or incorrect,
 please file an issue or submit a pull request.
 
-## How it works
+## Dependencies
 
-When someone submits a solution to exercism, the uuid of the submission gets
-placed in a queue implemented in redis.
-
-Rikki pulls the uuid off the queue, makes a request to exercism.io's API to get the
-code, then either processes it locally, or submits the code to one of the analyzer APIs,
-depending on the language.
-
-* Go: analyzes locally
-* Crystal: submits it to the crystal analyzer
-* Ruby: submits it to the [ruby analyzer](https://github.com/exercism/rikki-ruby-analyzer)
+* Ruby Analyzer
+    * **github repo**: https://github.com/exercism/rikki-ruby-analyzer
+    * **deployed to**: heroku (https://git.heroku.com/exercism-ruby-analyzer.git)
+    * **URL**: http://ruby-analyzer.exercism.io
+* Crystal Analyzer
+    * **github repo**: https://github.com/mhelmetag/crystal-analyzer
+    * **deployed to**: heroku (https://git.heroku.com/exercism-crystal-analyzer.git)
+    * **URL**: http://crystal-analyzer.exercism.io
 
 The Ruby analyzer uses analyzers/rules defined in the [exercism-analysis repository](https://github.com/JacobNinja/exercism-analysis),
 and responds with a list of violations. Each violation consists of type and a
@@ -36,6 +34,19 @@ possible list of keys.
   ]
 }
 ```
+
+## How it works
+
+When someone submits a solution to exercism, the uuid of the submission gets
+placed in a queue implemented in redis.
+
+Rikki pulls the uuid off the queue, makes a request to exercism.io's API to get the
+code, then either processes it locally, or submits the code to one of the analyzer APIs,
+depending on the language.
+
+* Go: analyzes locally
+* Crystal: submits it to the crystal analyzer
+* Ruby: submits it to the ruby analyzer
 
 The `comments/` directory of the rikki project contains a directory for each
 `type`, and a markdown file for each `key`.
