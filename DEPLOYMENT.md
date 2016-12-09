@@ -39,7 +39,8 @@ export EXERCISM=http://exercism.io
 export ANALYSSEUR=http://analysseur.exercism.io
 export RIKKI_SECRET=<shared secret>
 export RIKKI_FEEDBACK_DIR=/usr/local/rikki/current/comments
-/usr/local/rikki/current/rikki -exercism=$EXERCISM -analysseur=$ANALYSSEUR -redis=$REDIS
+export CRYSTAL_ANALYZER=http://crystal-analyzer.exercism.io
+/usr/local/rikki/current/rikki -exercism=$EXERCISM -analysseur=$ANALYSSEUR -redis=$REDIS -crystal-analyzer=$CRYSTAL_ANALYZER
 end script
 ```
 
