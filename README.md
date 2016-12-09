@@ -9,12 +9,12 @@ please file an issue or submit a pull request.
 
 ## Dependencies
 
-* Ruby Analyzer
-    * **github repo**: https://github.com/exercism/rikki-ruby-analyzer
+* **Ruby Analyzer**
+    * **GitHub repo**: https://github.com/exercism/rikki-ruby-analyzer
     * **deployed to**: heroku (https://git.heroku.com/exercism-ruby-analyzer.git)
     * **URL**: http://ruby-analyzer.exercism.io
-* Crystal Analyzer
-    * **github repo**: https://github.com/mhelmetag/crystal-analyzer
+* **Crystal Analyzer**
+    * **GitHub repo**: https://github.com/mhelmetag/crystal-analyzer
     * **deployed to**: heroku (https://git.heroku.com/exercism-crystal-analyzer.git)
     * **URL**: http://crystal-analyzer.exercism.io
 
