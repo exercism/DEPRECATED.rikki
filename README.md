@@ -86,3 +86,9 @@ you wish to process, and enqueue the job with:
 ```
 Jobs::Analyze.perform_async(uuid)
 ```
+
+## Deploying
+
+See the
+[DEPLOYMENT.md](https://github.com/exercism/rikki/blob/master/DEPLOYMENT.md)
+file for more information.
