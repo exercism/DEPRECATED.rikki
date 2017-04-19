@@ -34,7 +34,7 @@ func TestAnalyze(t *testing.T) {
 		Path = ""
 
 		// Fake out the files to analyze. We only care what the server responds.
-		smells, err := Analyze(map[string]string{"test.cr": "code"})
+		smells, err := Analyze("", map[string]string{"test.cr": "code"})
 		if err != nil {
 			t.Fatal(err)
 		}

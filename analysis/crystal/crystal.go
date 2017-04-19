@@ -34,7 +34,7 @@ type problem struct {
 }
 
 // Analyze Crystal code for formatting errors (and, possibly, other bad things later).
-func Analyze(files map[string]string) ([]string, error) {
+func Analyze(_ string, files map[string]string) ([]string, error) {
 	var sources []string
 	for _, source := range files {
 		sources = append(sources, source)

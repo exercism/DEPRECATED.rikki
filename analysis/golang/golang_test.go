@@ -318,7 +318,7 @@ func TestAnalyze(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		smells, err := Analyze(map[string]string{"code.go": test.code})
+		smells, err := Analyze("", map[string]string{"code.go": test.code})
 		if err != nil {
 			t.Fatal(err)
 		}
