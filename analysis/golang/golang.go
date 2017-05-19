@@ -46,7 +46,7 @@ func init() {
 }
 
 // Analyze detects certain issues in Go code.
-func Analyze(files map[string]string) ([]string, error) {
+func Analyze(_ string, files map[string]string) ([]string, error) {
 	s := newSolution(files)
 	if err := s.write(); err != nil {
 		return nil, err

@@ -22,6 +22,7 @@ func NewExercism(host, auth string) *Exercism {
 type codePayload struct {
 	TrackID       string            `json:"track_id"`
 	SolutionFiles map[string]string `json:"solution_files"`
+	Slug          string            `json:"slug"`
 	Error         string            `json:"error"`
 }
 
@@ -33,6 +34,7 @@ type commentBody struct {
 type Solution struct {
 	TrackID string
 	Files   map[string]string
+	Slug    string
 }
 
 // FetchSolution fetches the code of a solution from the exercism API.
@@ -61,7 +63,7 @@ func (e *Exercism) FetchSolution(uuid string) (*Solution, error) {
 		return nil, fmt.Errorf("%s - %s\n", uuid, err)
 	}
 
-	return &Solution{TrackID: cp.TrackID, Files: cp.SolutionFiles}, nil
+	return &Solution{TrackID: cp.TrackID, Slug: cp.Slug, Files: cp.SolutionFiles}, nil
 }
 
 // SubmitComment submits a rikki- comment to a particular submission via the exercism API.

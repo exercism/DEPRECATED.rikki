@@ -25,7 +25,7 @@ type payload struct {
 }
 
 // Analyze detects a specific set of code smells in Ruby code.
-func Analyze(files map[string]string) ([]string, error) {
+func Analyze(slug string, files map[string]string) ([]string, error) {
 	var sources []string
 	for _, source := range files {
 		sources = append(sources, source)

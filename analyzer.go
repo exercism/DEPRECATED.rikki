@@ -22,7 +22,7 @@ type Analyzer struct {
 	comments map[string]map[string][]byte
 }
 
-type analyzeFunc func(map[string]string) ([]string, error)
+type analyzeFunc func(string, map[string]string) ([]string, error)
 
 // NewAnalyzer configures an analyzer job to talk to the exercism and whatever analysis APIs we're using.
 // We load the comments from disc when we create the analyzer.
@@ -98,7 +98,7 @@ func (analyzer *Analyzer) process(msg *workers.Msg) {
 		lgr.Printf("skipping - rikki- doesn't support %s\n", solution.TrackID)
 		return
 	}
-	smells, err := fn(solution.Files)
+	smells, err := fn(solution.Slug, solution.Files)
 	if err != nil {
 		lgr.Printf("%s - %s", uuid, err)
 		return
